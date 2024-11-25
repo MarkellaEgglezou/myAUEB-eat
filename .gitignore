@@ -1,0 +1,10 @@
+*.iml
+lesxi/.idea/
+lesxi/.gradle/
+lesxi/local.properties
+lesxi/.idea/workspace.xml
+lesxi/.idea/libraries
+lesxi/build/
+lesxi/captures/
+lesxi/.externalNativeBuild/
+
