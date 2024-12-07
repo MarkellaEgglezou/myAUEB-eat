@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">lesxi</string>
+    <string name="title_activity_complaint_form">ComplaintFormActivity</string>
+    <string name="complaint_category">What is your complaint category?</string>
+    <string name="complaint">What is your complaint?</string>
+    <string name="upload_photo">Would you like to upload a photo?</string>
 </resources>
