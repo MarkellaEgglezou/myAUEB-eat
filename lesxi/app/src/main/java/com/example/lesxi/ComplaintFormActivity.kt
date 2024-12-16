@@ -76,12 +76,12 @@ fun Form() {
         EditTextField(modifier = Modifier.padding(bottom =
         32.dp).fillMaxWidth())
         Spacer(modifier = Modifier.height(120.dp))
-        Button()
+        Button {}
     }
 }
 
 @Composable
-fun Button(modifier: Modifier = Modifier) {
+fun Button(modifier: Modifier.Companion = Modifier, onClick: () -> Unit) {
     Column (
         modifier = modifier
             .fillMaxSize(),

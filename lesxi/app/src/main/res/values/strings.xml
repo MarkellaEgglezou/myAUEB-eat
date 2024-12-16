@@ -5,4 +5,5 @@
     <string name="complaint">What is your complaint?</string>
     <string name="upload_photo">Would you like to upload a photo?</string>
     <string name="submit">Submit Form</string>
+    <string name="menu_title">Menu</string>
 </resources>
