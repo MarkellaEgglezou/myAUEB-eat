@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1002984324011",
+    "project_id": "lesxi-app",
+    "storage_bucket": "lesxi-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1002984324011:android:ea350ec90f1b57c9ac30ee",
+        "android_client_info": {
+          "package_name": "com.example.lesxi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvzl0BK2Nungeh9Q3JZBNEsVMDPCtLLNI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1002984324011:android:02caa0674d82be2dac30ee",
+        "android_client_info": {
+          "package_name": "com.mobile.lesxi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvzl0BK2Nungeh9Q3JZBNEsVMDPCtLLNI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
