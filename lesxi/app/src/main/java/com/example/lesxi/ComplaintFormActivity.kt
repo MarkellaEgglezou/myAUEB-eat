@@ -81,7 +81,7 @@ fun Form() {
 }
 
 @Composable
-fun Button(modifier: Modifier.Companion = Modifier, onClick: () -> Unit) {
+fun Button(modifier: Modifier = Modifier, onClick: @Composable () -> Unit) {
     Column (
         modifier = modifier
             .fillMaxSize(),

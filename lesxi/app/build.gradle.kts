@@ -53,6 +53,9 @@ android {
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("com.google.firebase:firebase-analytics:22.1.2")
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
@@ -71,6 +74,7 @@ dependencies {
     implementation("androidx.navigation:navigation-runtime-ktx:2.8.5")
     implementation("androidx.navigation:navigation-compose:2.8.5")
     implementation("androidx.compose.material3:material3-android:1.3.1")
+    implementation("com.google.firebase:firebase-auth-ktx:23.1.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")

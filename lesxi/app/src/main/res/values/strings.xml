@@ -6,4 +6,9 @@
     <string name="upload_photo">Would you like to upload a photo?</string>
     <string name="submit">Submit Form</string>
     <string name="menu_title">Menu</string>
+    <string name="nav_item_menu">Menu</string>
+    <string name="nav_item_homepage">Home</string>
+    <string name="nav_item_reservations">Reservations</string>
+    <string name="nav_item_profile">Profile</string>
+
 </resources>
