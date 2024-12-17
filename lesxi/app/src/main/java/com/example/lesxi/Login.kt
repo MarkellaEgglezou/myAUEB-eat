@@ -16,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -33,6 +34,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.lesxi.ui.theme.Bordeaux
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -44,17 +46,17 @@ fun LoginRegisterScreen() {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
-    val navController = rememberNavController()
+//    val navController = rememberNavController()
     val auth = FirebaseAuth.getInstance()
     val firestore = FirebaseFirestore.getInstance()
 
-    Scaffold(
-        bottomBar = { BottomNavigationBar(navController) },
-        content = { padding ->
-            // Pass the padding to NavigationGraph to ensure proper layout
-            NavigationGraph(navController = navController, modifier = Modifier.padding(padding))
-        }
-    )
+//    Scaffold(
+//        bottomBar = { BottomNavigationBar(navController) },
+//        content = { padding ->
+//            // Pass the padding to NavigationGraph to ensure proper layout
+//            NavigationGraph(navController = navController, modifier = Modifier.padding(padding))
+//        }
+//    )
 
     Column(
         modifier = Modifier
@@ -142,10 +144,10 @@ fun LoginRegisterScreen() {
 
         if (isLoginMode) {
             // Login button
-            LoginButton(username = username, password = password, navController = navController)
+            LoginButton(username = username, password = password)
         } else {
             // Register button
-            RegisterButton(email=username, password = password, confirm = confirmPassword, navController = navController)
+            RegisterButton(email=username, password = password, confirm = confirmPassword)
         }
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -154,23 +156,27 @@ fun LoginRegisterScreen() {
 }
 
 @Composable
-fun LoginButton(modifier: Modifier = Modifier, username: String, password: String, navController: NavHostController) {
+fun LoginButton(modifier: Modifier = Modifier, username: String, password: String) {
     Column (
         modifier = modifier
             .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         androidx.compose.material3.Button(onClick = {
-            loginUser(username, password, navController)
-        }) {
+            if (username=="mchri" && password== "1234") {
+                loginUser(username, password)
+        }
+        }, colors = buttonColors(Color(0xFF762525)))
+        {
             Text("Login")
         }
     }
 }
 
 
+
 @Composable
-fun RegisterButton(modifier: Modifier = Modifier, email: String, password: String,confirm: String, navController: NavHostController) {
+fun RegisterButton(modifier: Modifier = Modifier, email: String, password: String,confirm: String) {
     Column (
         modifier = modifier
             .fillMaxSize(),
@@ -178,7 +184,7 @@ fun RegisterButton(modifier: Modifier = Modifier, email: String, password: Strin
     ) {
         androidx.compose.material3.Button(onClick = {
             if (password == confirm) {
-                registerUser(email = email, password = password, navController = navController)
+                registerUser(email = email, password = password)
             }
         } ){
             Text("Register")
@@ -186,12 +192,12 @@ fun RegisterButton(modifier: Modifier = Modifier, email: String, password: Strin
     }
 }
 
-private fun loginUser(email: String, password: String, navController: NavHostController) {
+private fun loginUser(email: String, password: String) {
     FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
         .addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 // Navigate to Menu screen
-                navController.navigate("menu")
+                print("Success")
             } else {
                 // Handle error (e.g., incorrect credentials)
 //                Toast.makeText(context, "Login Failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
@@ -200,7 +206,7 @@ private fun loginUser(email: String, password: String, navController: NavHostCon
 }
 
 
-private fun registerUser(email: String, password: String, navController: NavHostController) {
+private fun registerUser(email: String, password: String) {
     FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
         .addOnCompleteListener { task ->
             if (task.isSuccessful) {
@@ -217,7 +223,7 @@ private fun registerUser(email: String, password: String, navController: NavHost
                     .document("user_id_2")
                     .set(user)
                     .addOnSuccessListener {
-                        navController.navigate("menu")
+                        print("Success")
                     }
 //                    .addOnFailureListener { exception ->
 //                        // Handle error
