@@ -12,12 +12,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -44,6 +45,10 @@ class ComplaintFormActivity : ComponentActivity() {
 
 @Composable
 fun Form() {
+    val category = remember { mutableStateOf("") }
+    val complaint = remember { mutableStateOf("") }
+    val photo = remember { mutableStateOf("") }
+
     Column(
         modifier = Modifier
             .statusBarsPadding()
@@ -55,33 +60,51 @@ fun Form() {
             text = stringResource(R.string.complaint_category),
             modifier = Modifier
                 .padding(bottom = 16.dp, top = 40.dp)
-                .align(alignment = Alignment.Start)
+                .align(Alignment.Start)
         )
-        EditTextField(modifier = Modifier.padding(bottom =
-        32.dp).fillMaxWidth())
+        EditTextField(
+            value = category.value,
+            onValueChange = { category.value = it },
+            modifier = Modifier
+                .padding(bottom = 32.dp)
+                .fillMaxWidth()
+        )
+
         Text(
             text = stringResource(R.string.complaint),
             modifier = Modifier
                 .padding(bottom = 16.dp, top = 40.dp)
-                .align(alignment = Alignment.Start)
+                .align(Alignment.Start)
         )
-        EditTextField(modifier = Modifier.padding(bottom =
-        32.dp).fillMaxWidth())
+        EditTextField(
+            value = complaint.value,
+            onValueChange = { complaint.value = it },
+            modifier = Modifier
+                .padding(bottom = 32.dp)
+                .fillMaxWidth()
+        )
+
         Text(
             text = stringResource(R.string.upload_photo),
             modifier = Modifier
                 .padding(bottom = 16.dp, top = 40.dp)
-                .align(alignment = Alignment.Start)
+                .align(Alignment.Start)
         )
-        EditTextField(modifier = Modifier.padding(bottom =
-        32.dp).fillMaxWidth())
+        EditTextField(
+            value = photo.value,
+            onValueChange = { photo.value = it },
+            modifier = Modifier
+                .padding(bottom = 32.dp)
+                .fillMaxWidth()
+        )
+
         Spacer(modifier = Modifier.height(120.dp))
-        Button {}
+        SubmitButton {}
     }
 }
 
 @Composable
-fun Button(modifier: Modifier = Modifier, onClick: @Composable () -> Unit) {
+fun SubmitButton(modifier: Modifier.Companion = Modifier, onClick: @Composable () -> Unit) {
     Column (
         modifier = modifier
             .fillMaxSize(),
@@ -93,12 +116,11 @@ fun Button(modifier: Modifier = Modifier, onClick: @Composable () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditTextField(modifier: Modifier = Modifier) {
+fun EditTextField(value: String, onValueChange: (String) -> Unit, modifier: Modifier = Modifier) {
     TextField(
-        value = "",
-        onValueChange = {},
+        value = value,
+        onValueChange = onValueChange,
         modifier = modifier
     )
 }

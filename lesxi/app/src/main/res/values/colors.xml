@@ -8,4 +8,12 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="background">#FF762525</color>
+
+    <color name="purple_80">#D0BCFF</color> <!-- Purple80 -->
+    <color name="purple_grey_80">#CCC2DC</color> <!-- PurpleGrey80 -->
+    <color name="pink_80">#EFB8C8</color> <!-- Pink80 -->
+    <color name="purple_40">#6650A4</color> <!-- Purple40 -->
+    <color name="purple_grey_40">#625B71</color> <!-- PurpleGrey40 -->
+    <color name="pink_40">#7D5260</color> <!-- Pink40 -->
+    <color name="bordeaux">#762525</color> <!-- Bordeaux -->
 </resources>
