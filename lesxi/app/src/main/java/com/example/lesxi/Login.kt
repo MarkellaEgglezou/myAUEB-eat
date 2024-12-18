@@ -53,13 +53,7 @@ fun LoginRegisterScreen() {
     val auth = FirebaseAuth.getInstance()
     val firestore = FirebaseFirestore.getInstance()
 
-//    Scaffold(
-//        bottomBar = { BottomNavigationBar(navController) },
-//        content = { padding ->
-//            // Pass the padding to NavigationGraph to ensure proper layout
-//            NavigationGraph(navController = navController, modifier = Modifier.padding(padding))
-//        }
-//    )
+
 
     Column(
         modifier = Modifier
