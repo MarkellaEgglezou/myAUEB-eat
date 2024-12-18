@@ -22,13 +22,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-
+import com.example.lesxi.ui.theme.LesxiTheme
 
 
 // Setup your Bottom Navigation Bar
@@ -53,10 +54,10 @@ fun BottomNavigationBar(navController: NavController) {
             onClick = { navController.navigate("menu") }
         )
         BottomNavigationItem(
-            icon = { Icon(Icons.Default.Call, contentDescription = "Reservations") },
+            icon = { Icon(Icons.Default.Call, contentDescription = "Forms") },
             label = { R.string.nav_item_reservations },
             selected = false,
-            onClick = { navController.navigate("profile") }
+            onClick = { navController.navigate("form") }
         )
 
         BottomNavigationItem(
@@ -79,9 +80,9 @@ fun NavigationGraph(navController: NavHostController, modifier: Modifier) {
     ) {
         // Define the composable destinations
         composable("home") { HomeScreen() }
-        composable("menu") { MenuScreen()}
-        composable("search") { SearchScreen() }
-        composable("profile") { ProfileScreen() }
+        composable("menu") { MenuLesxi() }
+        composable("form") { Form() }
+        composable("profile") { LoginRegisterScreen() }
     }
 }
 
@@ -96,43 +97,5 @@ fun HomeScreen() {
     ) {
     }
 }
-@Composable
-fun MenuScreen() {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Text("Sucess")
-    }
-}
-
-@Composable
-fun SearchScreen() {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Text("Search Screen")
-    }
-}
-
-@Composable
-fun ProfileScreen() {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Text("Profile Screen")
-    }
-}
 
 
-@Composable
-fun ScreenContent(screenName: String) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Text(text = screenName, style = MaterialTheme.typography.headlineLarge)
-    }
-}

@@ -21,7 +21,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            LoginRegisterScreen()
+            val navController = rememberNavController()
+
+            Scaffold(
+                bottomBar = { BottomNavigationBar(navController) }
+            ) { innerPadding ->
+                NavigationGraph(navController = navController, modifier = Modifier.padding(innerPadding))
+            }
         }
 
         // Initialize Firestore
