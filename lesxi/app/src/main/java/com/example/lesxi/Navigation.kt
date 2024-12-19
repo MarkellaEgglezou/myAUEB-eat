@@ -32,7 +32,7 @@ import androidx.navigation.compose.composable
 import com.example.lesxi.ui.theme.LesxiTheme
 
 
-// Setup your Bottom Navigation Bar
+
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     BottomNavigation(
@@ -75,27 +75,16 @@ fun BottomNavigationBar(navController: NavController) {
 fun NavigationGraph(navController: NavHostController, modifier: Modifier) {
     NavHost(
         navController = navController,
-        startDestination = "home",    // Set the start destination to home
-        modifier = modifier          // Optional modifier (e.g., padding)
+        startDestination = "home",
+        modifier = modifier
     ) {
-        // Define the composable destinations
-        composable("home") { HomeScreen() }
-        composable("menu") { MenuLesxi() }
+        composable("home") { MenuNavigation() }
+        composable("menu") { ReserveTableScreen() }
         composable("form") { Form() }
         composable("profile") { LoginRegisterScreen() }
     }
 }
 
 
-
-// Screen Composables for each route
-@Composable
-fun HomeScreen() {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()
-    ) {
-    }
-}
 
 
