@@ -1,6 +1,7 @@
 package com.example.lesxi
 
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,17 +11,24 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,7 +45,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 
 data class MenuItem(
-    val itemID: String = " ",
+    val itemID: String = "",
     val title: String = "",
     val description: String = ""
 )
@@ -46,22 +54,24 @@ data class MenuItem(
 fun MenuNavigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "menu_items") {
-        composable("menu_items") {
+    NavHost(navController = navController, startDestination = Routes.menu) {
+        composable(Routes.menu) {
             MenuLesxi(navController = navController)
         }
-        composable("menu_item_details/{item.itemID}") { backStackEntry ->
-            val itemId = backStackEntry.arguments?.getString("itemID") ?: ""
-            val item = MenuItem(itemId, "title", "description")
-            MenuItemDetailsScreen(item.itemID)
+        composable(Routes.menuItemDetails+ "/{itemID}") { backStackEntry ->
+            val itemID = backStackEntry.arguments?.getString("itemID") ?: ""
+            MenuItemDetailsScreen(itemID)
         }
     }
 }
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuLesxi(navController: NavHostController) {
     val db = FirebaseFirestore.getInstance()
     var items by remember { mutableStateOf<List<MenuItem>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
         db.collection("menu")
@@ -79,31 +89,42 @@ fun MenuLesxi(navController: NavHostController) {
     if (isLoading) {
         CircularProgressIndicator()
     } else {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Top
-        ) {
-            Text(
-                text = "Μενού",
-                fontSize = 24.sp,
-                modifier = Modifier
-                    .padding(bottom = 16.dp, top = 40.dp)
-            )
-
-
-            items.forEach { item ->
-                MenuItems(item, navController = navController)
-                Spacer(modifier = Modifier.height(20.dp))
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TopAppBarDefaults.mediumTopAppBarColors(
+                        containerColor = Color(0xFF762525),
+                        titleContentColor = Color.White
+                    ),
+                    title = {
+                        Text(
+                            "Menu",
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    })
             }
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp)
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.Center
+            ) {
 
+                Spacer(modifier = Modifier.height(60.dp))
+                items.forEach { item ->
+                    MenuItems(item, navController = navController)
+                    Spacer(modifier = Modifier.height(20.dp))
+                }
+            }
         }
 
     }
 
 }
-
 
 
 @Composable
@@ -113,12 +134,12 @@ fun MenuItems(item: MenuItem, navController: NavHostController) {
             defaultElevation = 6.dp
         ),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF762525),
+            containerColor = Color.Gray,
         ),
         modifier = Modifier
             .size(width = 340.dp, height = 100.dp),
         onClick = {
-            navController.navigate("menu_item_details/${item.itemID}")
+            navController.navigate(Routes.menuItemDetails+ "/${item.itemID}")
         }
     ) {
         Row(
@@ -138,7 +159,7 @@ fun MenuItems(item: MenuItem, navController: NavHostController) {
             Icon(Icons.Default.KeyboardArrowRight, contentDescription = "see more")
         }
         Text(
-            text = item.itemID,
+            text = item.description,
             fontSize = 12.sp,
             modifier = Modifier
                 .padding(16.dp),
