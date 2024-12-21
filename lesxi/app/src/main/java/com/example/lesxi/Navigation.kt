@@ -4,6 +4,7 @@ package com.example.lesxi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
@@ -40,31 +41,32 @@ fun BottomNavigationBar(navController: NavController) {
         contentColor = Color.White,
         modifier = Modifier
             .padding(16.dp)
+            .clip(RoundedCornerShape(16.dp))
     ) {
         BottomNavigationItem(
             icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
             label = { R.string.nav_item_homepage },
             selected = false,
-            onClick = { navController.navigate("home") }
+            onClick = { navController.navigate(Routes.main_page) }
         )
         BottomNavigationItem(
             icon = { Icon(Icons.Default.Search, contentDescription = "Menu") },
             label = { R.string.nav_item_menu },
             selected = false,
-            onClick = { navController.navigate("menu") }
+            onClick = { navController.navigate(Routes.reservation_page) }
         )
         BottomNavigationItem(
             icon = { Icon(Icons.Default.Call, contentDescription = "Forms") },
             label = { R.string.nav_item_reservations },
             selected = false,
-            onClick = { navController.navigate("form") }
+            onClick = { navController.navigate(Routes.form) }
         )
 
         BottomNavigationItem(
             icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
             label = { R.string.nav_item_profile },
             selected = false,
-            onClick = { navController.navigate("profile") }
+            onClick = { navController.navigate(Routes.user) }
         )
     }
 }
@@ -78,10 +80,10 @@ fun NavigationGraph(navController: NavHostController, modifier: Modifier) {
         startDestination = "home",
         modifier = modifier
     ) {
-        composable("home") { MenuNavigation() }
-        composable("menu") { ReserveTableScreen() }
-        composable("form") { Form() }
-        composable("profile") { LoginRegisterScreen() }
+        composable(Routes.main_page) { MenuNavigation() }
+        composable(Routes.reservation_page) { ReserveTableScreen() }
+        composable(Routes.form) { Form() }
+        composable(Routes.user) { LoginRegisterScreen() }
     }
 }
 
