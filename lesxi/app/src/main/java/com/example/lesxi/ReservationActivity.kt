@@ -7,15 +7,22 @@ import android.text.Layout
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -76,8 +83,13 @@ fun ReserveTableScreen() {
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.height(16.dp))
+
             // Date Picker
             Text("Select Date")
+            //Spacer(modifier = Modifier.height(8.dp))
+
+
             Button(onClick = {
                 val calendar = Calendar.getInstance()
                 val year = calendar.get(Calendar.YEAR)
@@ -95,13 +107,11 @@ fun ReserveTableScreen() {
                     contentColor = Color.White
                 ),
                 modifier = Modifier.padding(16.dp)
-                ) {
+            ) {
                 Text(selectedDate)
             }
-
             // Time Picker
-            Text("Select Time")
-            Button(onClick = {
+            /*Button(onClick = {
                 val calendar = Calendar.getInstance()
                 val hour = calendar.get(Calendar.HOUR_OF_DAY)
                 val minute = calendar.get(Calendar.MINUTE)
@@ -120,7 +130,65 @@ fun ReserveTableScreen() {
                 ) {
                 Text(selectedTime)
             }
+                Button(onClick = {
+                    val calendar = Calendar.getInstance()
+                    val hour = calendar.get(Calendar.HOUR_OF_DAY)
+                    val minute = calendar.get(Calendar.MINUTE)
 
+                    TimePickerDialog(
+                        context,
+                        { _, h, m -> selectedTime = String.format("%02d:%02d", h, m) },
+                        hour, minute, true
+                    ).show()
+                },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF762525),
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(selectedTime)
+                }*/
+
+            Text("Select Time")
+
+            //Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.horizontalScroll(rememberScrollState()),
+                //verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ){
+                Button(onClick = {/*TODO*/},
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF762525),
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text("08:00")
+                }
+                // Time Picker
+                Button(onClick = {/* TODO*/},
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF762525),
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text("11:00")
+                }
+                Button(onClick = {/*TODO*/},
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF762525),
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text("12:00")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(128.dp))
             //People Picker
             Text("Number of People")
             val context = LocalContext.current
