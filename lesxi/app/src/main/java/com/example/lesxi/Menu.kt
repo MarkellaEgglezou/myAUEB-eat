@@ -47,15 +47,17 @@ import com.google.firebase.firestore.toObject
 data class MenuItem(
     val itemID: String = "",
     val title: String = "",
-    val description: String = ""
+    val description: String = "",
+    val allergens: List<String> = emptyList(),
+    val imageUrl: String = ""
 )
 
 @Composable
 fun MenuNavigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Routes.menu) {
-        composable(Routes.menu) {
+    NavHost(navController = navController, startDestination = Routes.main_page) {
+        composable(Routes.main_page) {
             MenuLesxi(navController = navController)
         }
         composable(Routes.menuItemDetails+ "/{itemID}") { backStackEntry ->
@@ -134,7 +136,7 @@ fun MenuItems(item: MenuItem, navController: NavHostController) {
             defaultElevation = 6.dp
         ),
         colors = CardDefaults.cardColors(
-            containerColor = Color.Gray,
+            containerColor = Color(0xFF762525),
         ),
         modifier = Modifier
             .size(width = 340.dp, height = 100.dp),
