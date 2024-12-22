@@ -77,7 +77,7 @@ fun BottomNavigationBar(navController: NavController) {
 fun NavigationGraph(navController: NavHostController, modifier: Modifier) {
     NavHost(
         navController = navController,
-        startDestination = "home",
+        startDestination = Routes.main_page,
         modifier = modifier
     ) {
         composable(Routes.main_page) { MenuNavigation() }
