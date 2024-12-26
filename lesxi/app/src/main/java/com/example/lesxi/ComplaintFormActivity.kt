@@ -12,15 +12,22 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults.buttonColors
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,9 +50,18 @@ class ComplaintFormActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Form() {
-    val category = remember { mutableStateOf("") }
+    val complaintCategories = listOf(
+        "Ποιότητα φαγητού",
+        "Εμπειρία στη λέσχη",
+        "Ταχύτητα εξυπηρέτησης",
+        "Διαδικαστικά προβλήματα",
+        "Άλλο"
+    )
+    val selectedCategory = remember { mutableStateOf("") }
+    val isDropdownExpanded = remember { mutableStateOf(false) }
     val complaint = remember { mutableStateOf("") }
     val photo = remember { mutableStateOf("") }
 
@@ -62,13 +78,35 @@ fun Form() {
                 .padding(bottom = 16.dp, top = 40.dp)
                 .align(Alignment.Start)
         )
-        EditTextField(
-            value = category.value,
-            onValueChange = { category.value = it },
-            modifier = Modifier
-                .padding(bottom = 32.dp)
-                .fillMaxWidth()
-        )
+        ExposedDropdownMenuBox(
+            expanded = isDropdownExpanded.value,
+            onExpandedChange = { isDropdownExpanded.value = !isDropdownExpanded.value }
+        ) {
+            TextField(
+                value = selectedCategory.value,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Επιλέξτε κατηγορία") },
+                modifier = Modifier
+                    .padding(bottom = 32.dp)
+                    .fillMaxWidth()
+                    .menuAnchor()
+            )
+            ExposedDropdownMenu(
+                expanded = isDropdownExpanded.value,
+                onDismissRequest = { isDropdownExpanded.value = false }
+            ) {
+                complaintCategories.forEach { category ->
+                    DropdownMenuItem(
+                        text = { Text(category) },
+                        onClick = {
+                            selectedCategory.value = category
+                            isDropdownExpanded.value = false
+                        }
+                    )
+                }
+            }
+        }
 
         Text(
             text = stringResource(R.string.complaint),
@@ -98,21 +136,8 @@ fun Form() {
                 .fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(120.dp))
+        Spacer(modifier = Modifier.height(40.dp))
         SubmitButton {}
-    }
-}
-
-@Composable
-fun SubmitButton(modifier: Modifier.Companion = Modifier, onClick: @Composable () -> Unit) {
-    Column (
-        modifier = modifier
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Button(onClick = { /*TODO*/ }) {
-            Text(stringResource(R.string.submit))
-        }
     }
 }
 
@@ -125,10 +150,16 @@ fun EditTextField(value: String, onValueChange: (String) -> Unit, modifier: Modi
     )
 }
 
-@Preview(showBackground = true)
 @Composable
-fun FormPreview() {
-    LesxiTheme {
-        Form()
+fun SubmitButton(modifier: Modifier.Companion = Modifier, onClick: @Composable () -> Unit) {
+    Column (
+        modifier = modifier
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Button(onClick = { /*TODO*/ }, colors = buttonColors(Color(0xFF762525)))
+        {
+            Text("Submit")
+        }
     }
 }
