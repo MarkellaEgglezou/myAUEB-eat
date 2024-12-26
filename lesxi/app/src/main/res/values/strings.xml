@@ -10,5 +10,6 @@
     <string name="nav_item_homepage">Home</string>
     <string name="nav_item_reservations">Reservations</string>
     <string name="nav_item_profile">Profile</string>
+    <string name="title_activity_profile">ProfileActivity</string>
 
 </resources>
