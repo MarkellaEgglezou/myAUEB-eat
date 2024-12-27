@@ -17,12 +17,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults.buttonColors
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -63,7 +64,7 @@ data class Reservation(
     val am: Int = 0,
     val dining_option: String = "",
     val table_id: Int = 0,
-    val timestamp: com.google.firebase.Timestamp? = null
+    val timestamp: Timestamp? = null
 )
 
 data class Review(
@@ -72,7 +73,7 @@ data class Review(
     val rating: Int = 0,
     val food_id: Int = 0,
     val comment: String = "",
-    val review_date: com.google.firebase.Timestamp? = null
+    val review_date: Timestamp? = null
 )
 
 data class Complaint(
@@ -80,7 +81,7 @@ data class Complaint(
     val am: Int = 0,
     val category: String = "",
     val complaint: String = "",
-    val timestamp: com.google.firebase.Timestamp? = null
+    val timestamp: Timestamp? = null
 )
 
 class ProfileActivity : ComponentActivity() {
@@ -229,50 +230,58 @@ fun UserProfile(
             )
         },
         content = { paddingValues ->
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .padding(paddingValues)
                     .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Top
+                    .padding(16.dp)
             ) {
                 // User Info
-                UserInfo(user)
+                item {
+                    UserInfo(user)
+                }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
 
                 // Reservations
-                SectionTitle("Reservations")
-                if (reservations.isEmpty()) {
-                    Text("No reservations found.")
-                } else {
-                    ReservationList(reservations.map { it })
+                item {
+                    SectionTitle("Reservations")
+                    if (reservations.isEmpty()) {
+                        Text("No reservations found.")
+                    } else {
+                        ReservationList(reservations.map { it })
+                    }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
 
                 // Reviews
-                SectionTitle("Reviews")
-                if (reviews.isEmpty()) {
-                    Text("No reviews available.")
-                } else {
-                    ReviewList(reviews.map { it })
+                item {
+                    SectionTitle("Reviews")
+                    if (reviews.isEmpty()) {
+                        Text("No reviews available.")
+                    } else {
+                        ReviewList(reviews.map { it })
+                    }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
 
                 // Complaints
-                SectionTitle("Complaints")
-                if (complaints.isEmpty()) {
-                    Text("No complaints registered.")
-                } else {
-                    ComplaintList(complaints.map { it })
+                item {
+                    SectionTitle("Complaints")
+                    if (complaints.isEmpty()) {
+                        Text("No complaints registered.")
+                    } else {
+                        ComplaintList(complaints.map { it })
+                    }
                 }
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                // Logout Button
-                LogOutButton {}
             }
         }
     )
@@ -313,17 +322,34 @@ fun UserInfo(user: User) {
         ) {
             Text("${user.name} ${user.surname}", style = MaterialTheme.typography.bodyLarge)
             Text("${user.am}", style = MaterialTheme.typography.bodySmall)
-            Text("${user.email}", style = MaterialTheme.typography.bodySmall)
+            Text(user.email, style = MaterialTheme.typography.bodySmall)
         }
 
-        // Edit Icon
-        Icon(
-            imageVector = Icons.Default.Edit,
-            contentDescription = "Edit Profile",
-            modifier = Modifier
-                .size(24.dp)
-                .clickable { /* TODO */ }
-        )
+        // Column to stack the icons vertically
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // Edit Icon
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = "Edit Profile",
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable { /* TODO */ }
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))  // Space between icons
+
+            // Logout Icon
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                contentDescription = "Logout",
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable { /* TODO */ }
+            )
+        }
     }
 }
 
@@ -349,50 +375,157 @@ fun formatTimestamp(timestamp: Timestamp?): String {
 
 @Composable
 fun ReservationList(reservations: List<Reservation>) {
-    LazyColumn(modifier = Modifier.heightIn(max = 150.dp)) {
-        items(reservations) { reservation ->
-            // Display the reservation details
-            Text("- Time & Date: ${formatTimestamp(reservation.timestamp)}")
-            Text("- Table: ${reservation.table_id}")
-            Text("- Dining Option: ${reservation.dining_option}")
+    // State to track if the list is expanded
+    var isExpanded by remember { mutableStateOf(false) }
+
+    LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
+        item {
+            // Show only the first reservation by default
+            if (reservations.isNotEmpty()) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(formatTimestamp(reservations[0].timestamp))
+                        Text("Table: ${reservations[0].table_id}")
+                        Text("Dining Option: ${reservations[0].dining_option}")
+                    }
+                }
+            }
+
+            // Show the Expand button if the list has more than one item
+            if (reservations.size > 1) {
+                Button(
+                    onClick = { isExpanded = !isExpanded },
+                    colors = buttonColors(Color(0xFF762525)),
+                    modifier = Modifier.fillMaxWidth().padding(8.dp)
+                ) {
+                    Text(if (isExpanded) "Show Less" else "Show More")
+                }
+
+                // Show the remaining reservations if expanded
+                if (isExpanded) {
+                    reservations.drop(1).forEach { reservation ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text(formatTimestamp(reservation.timestamp))
+                                Text("Table: ${reservation.table_id}")
+                                Text("Dining Option: ${reservation.dining_option}")
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
 fun ReviewList(reviews: List<Review>) {
-    LazyColumn(modifier = Modifier.heightIn(max = 150.dp)) {
-        items(reviews) { review ->
-            // Display the review details
-            Text("- Time & Date: ${formatTimestamp(review.review_date)}")
-            Text("- Rating: ${review.rating}")
-            Text("- Comment: ${review.comment}")
+    var isExpanded by remember { mutableStateOf(false) }
+
+    LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
+        item {
+            if (reviews.isNotEmpty()) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(formatTimestamp(reviews[0].review_date))
+                        Text("Rating: ${reviews[0].rating}")
+                        Text("Comment: ${reviews[0].comment}")
+                    }
+                }
+            }
+
+            if (reviews.size > 1) {
+                Button(
+                    onClick = { isExpanded = !isExpanded },
+                    colors = buttonColors(Color(0xFF762525)),
+                    modifier = Modifier.fillMaxWidth().padding(8.dp)
+                ) {
+                    Text(if (isExpanded) "Show Less" else "Show More")
+                }
+
+                if (isExpanded) {
+                    reviews.drop(1).forEach { review ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text(formatTimestamp(review.review_date))
+                                Text("Rating: ${review.rating}")
+                                Text("Comment: ${review.comment}")
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
 fun ComplaintList(complaints: List<Complaint>) {
-    LazyColumn(modifier = Modifier.heightIn(max = 150.dp)) {
-        items(complaints) { complaint ->
-            // Display the complaint details
-            Text("- Time & Date: ${formatTimestamp(complaint.timestamp)}")
-            Text("- Category: ${complaint.category}")
-            Text("- Complaint: ${complaint.complaint}")
-        }
-    }
-}
+    var isExpanded by remember { mutableStateOf(false) }
 
-@Composable
-fun LogOutButton(modifier: Modifier.Companion = Modifier, onClick: () -> Unit) {
-    Column (
-        modifier = modifier
-            .fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Button(onClick = { /*TODO*/ }, colors = buttonColors(Color(0xFF762525)))
-        {
-            Text("Log Out")
+    LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
+        item {
+            if (complaints.isNotEmpty()) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(formatTimestamp(complaints[0].timestamp))
+                        Text("Category: ${complaints[0].category}")
+                        Text("Complaint: ${complaints[0].complaint}")
+                    }
+                }
+            }
+
+            if (complaints.size > 1) {
+                Button(
+                    onClick = { isExpanded = !isExpanded },
+                    colors = buttonColors(Color(0xFF762525)),
+                    modifier = Modifier.fillMaxWidth().padding(8.dp)
+                ) {
+                    Text(if (isExpanded) "Show Less" else "Show More")
+                }
+
+                if (isExpanded) {
+                    complaints.drop(1).forEach { complaint ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text(formatTimestamp(complaint.timestamp))
+                                Text("Category: ${complaint.category}")
+                                Text("Complaint: ${complaint.complaint}")
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
