@@ -2,6 +2,7 @@ package com.example.lesxi
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.text.Layout
 import android.widget.Toast
@@ -14,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -24,22 +26,28 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.lesxi.ui.theme.LesxiTheme
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 import java.util.*
 
@@ -62,6 +70,8 @@ fun ReserveTableScreen() {
     var numberOfPeople by remember { mutableStateOf("") }
 
     val context = LocalContext.current
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    var currentSelectedTime by remember { mutableStateOf("") }
 
     // Main UI layout
     Scaffold(
@@ -70,25 +80,31 @@ fun ReserveTableScreen() {
                 modifier = Modifier.fillMaxWidth(),
                 colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Color(0xFF762525),
                     titleContentColor = Color.White),
-                title = { Text("Reserve a Table",
+                scrollBehavior = scrollBehavior,
+                title = { Text("Make a Reservation",
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth())})
-        }
+        },
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { paddingValues ->
         Column(
             modifier = Modifier
+                .fillMaxSize()
+                //.verticalScroll(rememberScrollState())
                 .padding(paddingValues)
-                .padding(16.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.Start
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
             // Date Picker
-            Text("Select Date")
-            //Spacer(modifier = Modifier.height(8.dp))
-
+            Text(
+                text = "Select Reservation Date",
+                style = androidx.compose.material.MaterialTheme.typography.h6,
+                modifier = Modifier.padding(bottom = 16.dp)
+                    //.padding(start = 16.dp)
+            )
 
             Button(onClick = {
                 val calendar = Calendar.getInstance()
@@ -96,142 +112,176 @@ fun ReserveTableScreen() {
                 val month = calendar.get(Calendar.MONTH)
                 val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-                DatePickerDialog(
+                val datePickerDialog = DatePickerDialog(
                     context,
                     { _, y, m, d -> selectedDate = "$d/${m + 1}/$y" },
                     year, month, day
-                ).show()
+                )
+
+                datePickerDialog.datePicker.minDate = calendar.timeInMillis
+                datePickerDialog.show()
             },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF762525),
-                    contentColor = Color.White
+                    disabledContentColor = Color.White
+
                 ),
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(selectedDate)
             }
-            // Time Picker
-            /*Button(onClick = {
-                val calendar = Calendar.getInstance()
-                val hour = calendar.get(Calendar.HOUR_OF_DAY)
-                val minute = calendar.get(Calendar.MINUTE)
 
-                TimePickerDialog(
-                    context,
-                    { _, h, m -> selectedTime = String.format("%02d:%02d", h, m) },
-                    hour, minute, true
-                ).show()
-            },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF762525),
-                    contentColor = Color.White
-                ),
-                modifier = Modifier.padding(16.dp)
-                ) {
-                Text(selectedTime)
-            }
-                Button(onClick = {
-                    val calendar = Calendar.getInstance()
-                    val hour = calendar.get(Calendar.HOUR_OF_DAY)
-                    val minute = calendar.get(Calendar.MINUTE)
+            // Sample reservation data
+            val timeSlots = listOf(
+                "08:00 AM", "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM", "03:00 PM", "07:00 PM", "07:30 PM", "08:00 PM"
+            )
+            val unavailableSlots = setOf("01:00 PM") // Example: slot already reserved
 
-                    TimePickerDialog(
-                        context,
-                        { _, h, m -> selectedTime = String.format("%02d:%02d", h, m) },
-                        hour, minute, true
-                    ).show()
-                },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF762525),
-                        contentColor = Color.White
-                    ),
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(selectedTime)
-                }*/
+            // Current time
+            val currentTime = LocalTime.now()
+            val formatter = DateTimeFormatter.ofPattern("hh:mm a")
+            val oneHourLater = currentTime.plusHours(1)
 
-            Text("Select Time")
-
-            //Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                modifier = Modifier.horizontalScroll(rememberScrollState()),
-                //verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ){
-                Button(onClick = {/*TODO*/},
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF762525),
-                        contentColor = Color.White
-                    ),
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text("08:00")
-                }
-                // Time Picker
-                Button(onClick = {/* TODO*/},
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF762525),
-                        contentColor = Color.White
-                    ),
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text("11:00")
-                }
-                Button(onClick = {/*TODO*/},
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF762525),
-                        contentColor = Color.White
-                    ),
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text("12:00")
-                }
+            // Filter available slots
+            val availableSlots = timeSlots.filter { timeSlot ->
+                val slotTime = LocalTime.parse(timeSlot, formatter)
+                !unavailableSlots.contains(timeSlot) && slotTime.isAfter(oneHourLater)
             }
 
-            Spacer(modifier = Modifier.height(128.dp))
-            //People Picker
-            Text("Number of People")
-            val context = LocalContext.current
-            val noofpeople = arrayOf("Select number of people", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
-            var expanded by remember { mutableStateOf(false) }
-            var selectedText by remember { mutableStateOf(noofpeople[0]) }
+            // Remember selected time state
+            val selectedTime = remember { mutableStateOf(availableSlots.firstOrNull() ?: "") }
 
-            Box(
-
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(32.dp)
+            @Composable
+            fun DropdownMenu(
+                availableSlots: List<String>,
+                selectedTime: String,
+                onTimeSelected: (String) -> Unit
             ) {
-                ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = {
-                        expanded = !expanded
-                    }
-                ) {
-                    TextField(
-                        value = selectedText,
-                        onValueChange = {},
-                        readOnly = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        modifier = Modifier.menuAnchor()
-                    )
+                var expanded = remember { mutableStateOf(false) }
 
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState())
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        noofpeople.forEach { item ->
-                            DropdownMenuItem(
-                                text = { Text(text = item) },
+                        availableSlots.forEach { time -> val isSelected = currentSelectedTime == time
+                            androidx.compose.material3.Button(
                                 onClick = {
-                                    selectedText = item
-                                    expanded = false
-                                    Toast.makeText(context, item, Toast.LENGTH_SHORT).show()
-                                }
-                            )
+                                    currentSelectedTime = time
+                                    onTimeSelected(time)
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (isSelected) Color(0xFF962626) else Color(0xFF762525),
+                                    contentColor = Color.White
+                                )
+                            ) {
+                                androidx.compose.material3.Text(text = time)
+                            }
+                        }
+                    }
+
+                }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+
+                Text(
+                    text = "Select Reservation Time",
+                    style = androidx.compose.material.MaterialTheme.typography.h6,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+                // Dropdown Menu for available times
+                DropdownMenu(
+                    availableSlots = availableSlots,
+                    selectedTime = selectedTime.value,
+                    onTimeSelected = { selectedTime.value = it }
+                )
+
+            Spacer(modifier = Modifier.height(16.dp))
+                //People Picker
+                Text("Number of People",
+                    style = androidx.compose.material.MaterialTheme.typography.h6,
+                    modifier = Modifier.padding(bottom = 16.dp))
+                val context = LocalContext.current
+                val noofpeople = arrayOf(
+                    "Select number of people",
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                    "6",
+                    "7",
+                    "8",
+                    "9",
+                    "10"
+                )
+                var expanded by remember { mutableStateOf(false) }
+                var selectedText by remember { mutableStateOf(noofpeople[0]) }
+
+                Box(
+
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(32.dp)
+                ) {
+                    ExposedDropdownMenuBox(
+                        expanded = expanded,
+                        onExpandedChange = {
+                            expanded = !expanded
+                        }
+                    ) {
+                        TextField(
+                            value = selectedText,
+                            colors = TextFieldDefaults.colors(focusedTextColor = Color.White,
+                                unfocusedTextColor = Color.White,
+                                focusedContainerColor = Color(0xFF962626),
+                                unfocusedContainerColor = Color(0xFF762525)),
+                            onValueChange = {},
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)},
+                            modifier = Modifier.menuAnchor()
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            noofpeople.forEach { item ->
+                                DropdownMenuItem(
+                                    text = { Text(text = item) },
+                                    onClick = {
+                                        selectedText = item
+                                        expanded = false
+                                        Toast.makeText(context, item, Toast.LENGTH_SHORT).show()
+                                    }
+                                )
+                            }
                         }
                     }
                 }
+
+            Spacer(modifier = Modifier.weight(1f))
+            Button(
+                onClick = {//TODO//
+                },
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF762525),
+                    contentColor = Color.White
+                )
+            ) {
+                Text("Next")
             }
         }
     }
