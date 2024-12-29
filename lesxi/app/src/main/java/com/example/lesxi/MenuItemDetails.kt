@@ -48,7 +48,7 @@ fun MenuItemDetailsScreen(itemID: String) {
     var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(itemID) {
-        db.collection("menu")
+        db.collection("Menu")
             .document(itemID)
             .get()
             .addOnSuccessListener { document ->
