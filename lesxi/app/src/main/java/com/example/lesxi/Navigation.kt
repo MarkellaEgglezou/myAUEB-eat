@@ -1,6 +1,6 @@
 package com.example.lesxi
 
-// Navigation.kt
+
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -45,26 +45,22 @@ fun BottomNavigationBar(navController: NavController) {
     ) {
         BottomNavigationItem(
             icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-            label = { R.string.nav_item_homepage },
             selected = false,
             onClick = { navController.navigate(Routes.main_page) }
         )
         BottomNavigationItem(
             icon = { Icon(Icons.Default.Search, contentDescription = "Menu") },
-            label = { R.string.nav_item_menu },
             selected = false,
             onClick = { navController.navigate(Routes.reservation_page) }
         )
         BottomNavigationItem(
             icon = { Icon(Icons.Default.Call, contentDescription = "Forms") },
-            label = { R.string.nav_item_reservations },
             selected = false,
             onClick = { navController.navigate(Routes.form) }
         )
 
         BottomNavigationItem(
             icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
-            label = { R.string.nav_item_profile },
             selected = false,
             onClick = { navController.navigate(Routes.user) }
         )
