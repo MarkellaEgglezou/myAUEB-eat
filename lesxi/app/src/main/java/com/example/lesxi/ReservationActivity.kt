@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
@@ -38,6 +39,7 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -46,10 +48,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.lesxi.ui.theme.LesxiTheme
+import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-import java.util.*
+import java.util.Calendar
 
 class ReservationActivity : ComponentActivity() {
 
@@ -59,6 +63,14 @@ class ReservationActivity : ComponentActivity() {
             ReserveTableScreen()
         }
     }
+}
+
+fun isToday(dateString: String): Boolean {
+    val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
+    val parsedDate = LocalDate.parse(dateString, formatter)
+    val today = LocalDate.now()
+
+    return parsedDate.isEqual(today)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,6 +84,7 @@ fun ReserveTableScreen() {
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     var currentSelectedTime by remember { mutableStateOf("") }
+    var isDisabled by remember { mutableStateOf(false) }
 
     // Main UI layout
     Scaffold(
@@ -127,26 +140,40 @@ fun ReserveTableScreen() {
 
                 ),
                 modifier = Modifier.padding(16.dp)
+                    .fillMaxWidth()
             ) {
                 Text(selectedDate)
             }
 
-            // Sample reservation data
-            val timeSlots = listOf(
-                "08:00 AM", "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM", "03:00 PM", "07:00 PM", "07:30 PM", "08:00 PM"
-            )
-            val unavailableSlots = setOf("01:00 PM") // Example: slot already reserved
+            val timeSlots = if (selectedDate != "Choose Date") {
+                listOf(
+                    "08:00 AM", "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM", "03:00 PM", "07:00 PM", "07:30 PM", "08:00 PM"
+                )
+            } else {
+                listOf()
+            }
+
+            // get unavailable slots of selectedDate
+            val unavailableSlots = setOf("01:00 PM") // Supposed to be filled by db
 
             // Current time
             val currentTime = LocalTime.now()
             val formatter = DateTimeFormatter.ofPattern("hh:mm a")
             val oneHourLater = currentTime.plusHours(1)
 
-            // Filter available slots
-            val availableSlots = timeSlots.filter { timeSlot ->
-                val slotTime = LocalTime.parse(timeSlot, formatter)
-                !unavailableSlots.contains(timeSlot) && slotTime.isAfter(oneHourLater)
+            val availableSlots = if (selectedDate != "Choose Date" && isToday(selectedDate)) {
+                // Filter slots only if it's today
+                timeSlots.filter { timeSlot ->
+                    val slotTime = LocalTime.parse(timeSlot, formatter)
+                    !unavailableSlots.contains(timeSlot) && slotTime.isAfter(oneHourLater)
+                }
+            } else {
+                // If it's not today, filter slots without considering the one-hour constraint
+                timeSlots.filter { timeSlot ->
+                    !unavailableSlots.contains(timeSlot)
+                }
             }
+
 
             // Remember selected time state
             val selectedTime = remember { mutableStateOf(availableSlots.firstOrNull() ?: "") }
@@ -188,7 +215,7 @@ fun ReserveTableScreen() {
                 }
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
 
                 Text(
@@ -205,14 +232,25 @@ fun ReserveTableScreen() {
                     onTimeSelected = { selectedTime.value = it }
                 )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
                 //People Picker
-                Text("Number of People",
-                    style = androidx.compose.material.MaterialTheme.typography.h6,
-                    modifier = Modifier.padding(bottom = 16.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    "Take Out?",
+                    style = androidx.compose.material.MaterialTheme.typography.h6
+                )
+                Switch(
+                    checked = isDisabled,
+                    onCheckedChange = { isDisabled = it })
+            }
                 val context = LocalContext.current
                 val noofpeople = arrayOf(
-                    "Select number of people",
+                    "Select number of people for dining in",
                     "1",
                     "2",
                     "3",
@@ -227,17 +265,18 @@ fun ReserveTableScreen() {
                 var expanded by remember { mutableStateOf(false) }
                 var selectedText by remember { mutableStateOf(noofpeople[0]) }
 
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Box(
 
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(32.dp)
+                        .padding(16.dp)
+                        .clip(RoundedCornerShape(12.dp))
                 ) {
                     ExposedDropdownMenuBox(
                         expanded = expanded,
-                        onExpandedChange = {
-                            expanded = !expanded
-                        }
+                        onExpandedChange = { if (!isDisabled) expanded = !expanded }
                     ) {
                         TextField(
                             value = selectedText,
@@ -247,6 +286,7 @@ fun ReserveTableScreen() {
                                 unfocusedContainerColor = Color(0xFF762525)),
                             onValueChange = {},
                             readOnly = true,
+                            enabled = !isDisabled,
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)},
                             modifier = Modifier.menuAnchor()
                         )
