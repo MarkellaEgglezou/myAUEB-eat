@@ -7,4 +7,6 @@ object Routes {
     var user = "user"
     var menu = "menu"
     var menuItemDetails = "menu_items_details"
+    var login = "login"
+    var random = "random"
 }
