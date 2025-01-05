@@ -8,10 +8,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
 
 class MainActivity : ComponentActivity() {
 
@@ -19,38 +18,18 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             val navController = rememberNavController()
+            LoginRegisterScreen(navController)
 
             Scaffold(
                 bottomBar = { BottomNavigationBar(navController) }
             ) { innerPadding ->
                 NavigationGraph(navController = navController, modifier = Modifier.padding(innerPadding))
             }
+
         }
 
-        // Initialize Firestore
-        firestore = FirebaseFirestore.getInstance()
-
     }
 
-
-}
-
-@Composable
-fun AppContent() {
-    val navController = rememberNavController()
-
-    Scaffold(
-        bottomBar = { BottomNavigationBar(navController) }
-    ) { innerPadding ->
-        NavigationGraph(navController = navController, modifier = Modifier.padding(innerPadding))
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    LoginRegisterScreen()
 }
