@@ -44,11 +44,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.lesxi.ui.theme.LesxiTheme
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -60,24 +61,15 @@ data class User(
 )
 
 data class Reservation(
-    val reservation_id: Int = 0,
+    val reservationId: Int = 0,
     val am: Int = 0,
-    val dining_option: String = "",
-    val table_id: Int = 0,
+    val diningOption: String = "",
+    val tableId: Int = 0,
     val timestamp: Timestamp? = null
 )
 
-data class Review(
-    val review_id: Int = 0,
-    val am: Int = 0,
-    val rating: Int = 0,
-    val food_id: Int = 0,
-    val comment: String = "",
-    val review_date: Timestamp? = null
-)
-
 data class Complaint(
-    val complaint_id: Int = 0,
+    val complaintId: Int = 0,
     val am: Int = 0,
     val category: String = "",
     val complaint: String = "",
@@ -94,7 +86,17 @@ class ProfileActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    ProfileScreen()
+                    val user = FirebaseAuth.getInstance().currentUser
+                    if (user != null) {
+                        ProfileScreen(user)
+                    } else {
+                        Text(
+                            "User not logged in",
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxSize()
+                        )
+
+                    }
                 }
             }
         }
@@ -102,37 +104,62 @@ class ProfileActivity : ComponentActivity() {
 }
 
 @Composable
-fun ProfileScreen() {
-    val am = 8210039
+fun ProfileScreen(firebaseUser: FirebaseUser) {
+    var am by remember { mutableStateOf<Int?>(null) }
     var user by remember { mutableStateOf<User?>(null) }
     var reservations by remember { mutableStateOf(listOf<Reservation>()) }
-    var reviews by remember { mutableStateOf(listOf<Review>()) }
     var complaints by remember { mutableStateOf(listOf<Complaint>()) }
 
 
     // Fetch all data
-    if (user == null) {
-        LaunchedEffect(Unit) {
-            fetchAllData(am) { fetchedUser, fetchedReservations, fetchedReviews, fetchedComplaints->
-                user = fetchedUser
-                reservations = fetchedReservations
-                reviews = fetchedReviews
-                complaints = fetchedComplaints
+    if (am == null) {
+        LaunchedEffect(firebaseUser.uid) {
+            fetchAm(firebaseUser.uid) { fetchedAm ->
+                am = fetchedAm
+                if (am != null) {
+                    fetchAllData(am!!) { fetchedUser, fetchedReservations, fetchedComplaints ->
+                        user = fetchedUser
+                        reservations = fetchedReservations
+                        complaints = fetchedComplaints
+                    }
+                }
             }
         }
     }
 
-    UserProfile(user, reservations, reviews, complaints)
+    if (am != null) {
+        UserProfile(user, reservations, complaints)
+    } else {
+        Text(
+            "Loading...",
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxSize()
+        )
+    }
 }
 
-fun fetchAllData(am: Int, onComplete: (User?, List<Reservation>, List<Review>,
-                                          List<Complaint>) -> Unit) {
+fun fetchAm(uid: String, onComplete: (Int?) -> Unit) {
+    val db = FirebaseFirestore.getInstance()
+
+    db.collection("User")
+        .whereEqualTo("uid", uid)
+        .get()
+        .addOnSuccessListener { documents ->
+            val user = documents.firstOrNull()?.toObject(User::class.java)
+            onComplete(user?.am)
+        }
+        .addOnFailureListener { exception ->
+            println("Error getting AM: $exception")
+            onComplete(null)
+        }
+}
+
+fun fetchAllData(am: Int, onComplete: (User?, List<Reservation>, List<Complaint>) -> Unit) {
     val db = FirebaseFirestore.getInstance()
 
     // Initialize the results
     var user: User? = null
     var reservations: List<Reservation> = listOf()
-    var reviews: List<Review> = listOf()
     var complaints: List<Complaint> = listOf()
 
     // Counter to ensure all async operations complete
@@ -142,7 +169,7 @@ fun fetchAllData(am: Int, onComplete: (User?, List<Reservation>, List<Review>,
     fun checkCompletion() {
         completedTasks++
         if (completedTasks == totalTasks) {
-            onComplete(user, reservations, reviews, complaints)
+            onComplete(user, reservations, complaints)
         }
     }
 
@@ -172,19 +199,6 @@ fun fetchAllData(am: Int, onComplete: (User?, List<Reservation>, List<Review>,
             checkCompletion()
         }
 
-    // Fetch Reviews
-    db.collection("Review")
-        .whereEqualTo("am", am)
-        .get()
-        .addOnSuccessListener { documents ->
-            reviews = documents.map { it.toObject(Review::class.java) }
-            checkCompletion()
-        }
-        .addOnFailureListener { exception ->
-            println("Error getting collection: $exception")
-            checkCompletion()
-        }
-
     // Fetch Complaints
     db.collection("Complaint")
         .whereEqualTo("am", am)
@@ -204,7 +218,6 @@ fun fetchAllData(am: Int, onComplete: (User?, List<Reservation>, List<Review>,
 fun UserProfile(
     user: User?,
     reservations: List<Reservation>,
-    reviews: List<Review>,
     complaints: List<Complaint>
     ) {
     if (user == null) {
@@ -252,20 +265,6 @@ fun UserProfile(
                         Text("No reservations found.")
                     } else {
                         ReservationList(reservations.map { it })
-                    }
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-
-                // Reviews
-                item {
-                    SectionTitle("Reviews")
-                    if (reviews.isEmpty()) {
-                        Text("No reviews available.")
-                    } else {
-                        ReviewList(reviews.map { it })
                     }
                 }
 
@@ -390,8 +389,8 @@ fun ReservationList(reservations: List<Reservation>) {
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(formatTimestamp(reservations[0].timestamp))
-                        Text("Table: ${reservations[0].table_id}")
-                        Text("Dining Option: ${reservations[0].dining_option}")
+                        Text("Table: ${reservations[0].tableId}")
+                        Text("Dining Option: ${reservations[0].diningOption}")
                     }
                 }
             }
@@ -417,59 +416,8 @@ fun ReservationList(reservations: List<Reservation>) {
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(formatTimestamp(reservation.timestamp))
-                                Text("Table: ${reservation.table_id}")
-                                Text("Dining Option: ${reservation.dining_option}")
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ReviewList(reviews: List<Review>) {
-    var isExpanded by remember { mutableStateOf(false) }
-
-    LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
-        item {
-            if (reviews.isNotEmpty()) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(formatTimestamp(reviews[0].review_date))
-                        Text("Rating: ${reviews[0].rating}")
-                        Text("Comment: ${reviews[0].comment}")
-                    }
-                }
-            }
-
-            if (reviews.size > 1) {
-                Button(
-                    onClick = { isExpanded = !isExpanded },
-                    colors = buttonColors(Color(0xFF762525)),
-                    modifier = Modifier.fillMaxWidth().padding(8.dp)
-                ) {
-                    Text(if (isExpanded) "Show Less" else "Show More")
-                }
-
-                if (isExpanded) {
-                    reviews.drop(1).forEach { review ->
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            shape = MaterialTheme.shapes.medium
-                        ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Text(formatTimestamp(review.review_date))
-                                Text("Rating: ${review.rating}")
-                                Text("Comment: ${review.comment}")
+                                Text("Table: ${reservation.tableId}")
+                                Text("Dining Option: ${reservation.diningOption}")
                             }
                         }
                     }
@@ -527,13 +475,5 @@ fun ComplaintList(complaints: List<Complaint>) {
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun Preview() {
-    LesxiTheme {
-        ProfileScreen()
     }
 }

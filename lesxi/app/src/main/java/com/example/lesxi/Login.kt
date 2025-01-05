@@ -306,7 +306,6 @@ private fun loginUser(email: String, password: String, appContext: Context) {
         }
 }
 
-
 private fun registerUser(email: String, name: String, surname: String, am: String, password: String, appContext: Context) {
     FirebaseAuth.getInstance().createUserWithEmailAndPassword(email,password)
         .addOnCompleteListener { task ->
@@ -342,4 +341,3 @@ private fun registerUser(email: String, name: String, surname: String, am: Strin
             }
         }
 }
-
