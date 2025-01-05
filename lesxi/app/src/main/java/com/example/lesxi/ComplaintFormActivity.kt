@@ -1,6 +1,8 @@
 package com.example.lesxi
 
+import android.content.Context
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -24,18 +26,32 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.lesxi.ui.theme.LesxiTheme
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
+
+data class ComplaintRecord(
+    val complaintId: Int = 0,
+    val am: Int = 0,
+    val category: String = "",
+    val complaint: String = "",
+    val timestamp: Timestamp? = null
+)
 
 class ComplaintFormActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +63,16 @@ class ComplaintFormActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Form()
+                    val user = FirebaseAuth.getInstance().currentUser
+                     if (user != null) {
+                        Form(user)
+                    } else {
+                        Text(
+                            "You need to login first",
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 }
             }
         }
@@ -56,7 +81,14 @@ class ComplaintFormActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Form() {
+fun Form(firebaseUser: FirebaseUser) {
+    var am by remember { mutableIntStateOf(0) }
+    LaunchedEffect(firebaseUser.uid) {
+        fetchAm(firebaseUser.uid) { fetchedAm ->
+            am = fetchedAm!!
+        }
+    }
+
     val complaintCategories = listOf(
         "Ποιότητα φαγητού",
         "Εμπειρία στη λέσχη",
@@ -184,14 +216,22 @@ fun Form() {
                 )
 
                 Spacer(modifier = Modifier.height(40.dp))
-                SubmitButton {
-                    selectedCategoryError.value = selectedCategory.value.isEmpty()
-                    complaintError.value = complaint.value.isEmpty()
+                val context = LocalContext.current
+                SubmitButton (
+                    onSubmit = {
+                        selectedCategoryError.value = selectedCategory.value.isEmpty()
+                        complaintError.value = complaint.value.isEmpty()
 
-                    if (!selectedCategoryError.value && !complaintError.value) {
-                        /* TODO */
+                        if (!selectedCategoryError.value && !complaintError.value) {
+                            submitComplaintToFirebase(
+                                am,
+                                selectedCategory.value,
+                                complaint.value,
+                                context
+                            )
+                        }
                     }
-                }
+                )
             }
         }
     )
@@ -209,12 +249,37 @@ fun EditTextField(value: String, onValueChange: (String) -> Unit, isError: Boole
 }
 
 @Composable
-fun SubmitButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun SubmitButton(
+    onSubmit: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Button(
-        onClick = onClick,
+        onClick = onSubmit,
         colors = buttonColors(Color(0xFF762525)),
         modifier = modifier
     ) {
         Text("Submit")
     }
+}
+
+fun submitComplaintToFirebase(am: Int, category: String, complaint: String,  context: Context) {
+    val firestore = FirebaseFirestore.getInstance()
+
+    val complaintRecord = ComplaintRecord(
+        am = am,
+        category = category,
+        complaint = complaint,
+        timestamp = Timestamp.now()
+    )
+
+    firestore.collection("Complaint")
+        .add(complaintRecord)
+        .addOnSuccessListener {
+            Toast.makeText(context, "Complaint submitted successfully",
+                Toast.LENGTH_SHORT).show()
+        }
+        .addOnFailureListener {
+            Toast.makeText(context, "Error submitting complaint: ${it.message}",
+                Toast.LENGTH_SHORT).show()
+        }
 }
