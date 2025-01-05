@@ -1,6 +1,7 @@
 package com.example.lesxi
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -42,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -109,7 +111,6 @@ fun ProfileScreen(firebaseUser: FirebaseUser) {
     var user by remember { mutableStateOf<User?>(null) }
     var reservations by remember { mutableStateOf(listOf<Reservation>()) }
     var complaints by remember { mutableStateOf(listOf<Complaint>()) }
-
 
     // Fetch all data
     if (am == null) {
@@ -306,6 +307,7 @@ fun ProfilePicture() {
 
 @Composable
 fun UserInfo(user: User) {
+    val context = LocalContext.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
@@ -335,7 +337,9 @@ fun UserInfo(user: User) {
                 contentDescription = "Edit Profile",
                 modifier = Modifier
                     .size(24.dp)
-                    .clickable { /* TODO */ }
+                    .clickable {
+                        /* TODO */
+                    }
             )
 
             Spacer(modifier = Modifier.height(8.dp))  // Space between icons
@@ -346,7 +350,10 @@ fun UserInfo(user: User) {
                 contentDescription = "Logout",
                 modifier = Modifier
                     .size(24.dp)
-                    .clickable { /* TODO */ }
+                    .clickable {
+                        FirebaseAuth.getInstance().signOut()
+                        Toast.makeText(context, "Logout successful", Toast.LENGTH_SHORT).show()
+                    }
             )
         }
     }
