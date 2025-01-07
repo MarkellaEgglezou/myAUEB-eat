@@ -9,14 +9,19 @@
         android:background="@color/background"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/aueb_eat"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/aueb_eat_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Lesxi"
         tools:targetApi="31">
         <activity
             android:name=".ProfileActivity"
+            android:exported="false"
+            android:label="@string/title_activity_profile"
+            android:theme="@style/Theme.Lesxi" />
+        <activity
+            android:name=".ConfirmationActivity"
             android:exported="false"
             android:label="@string/title_activity_profile"
             android:theme="@style/Theme.Lesxi" />
