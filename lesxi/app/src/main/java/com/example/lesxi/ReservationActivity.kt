@@ -311,7 +311,19 @@ fun ReserveTableScreen() {
 
             Spacer(modifier = Modifier.weight(1f))
             Button(
-                onClick = {//TODO//
+                onClick = {if (selectedDate != "Choose Date" && selectedTime.value.isNotEmpty()) { //pass arguments to test file ConfirmationActivity.kt
+                    val intent = Intent(context, ConfirmationActivity::class.java)
+
+                    // Pass number of people based on the "Take Out" toggle state
+                    val numberOfPeople = if (isDisabled) "0" else selectedText
+
+                    intent.putExtra("SELECTED_DATE", selectedDate)
+                    intent.putExtra("SELECTED_TIME", selectedTime.value)
+                    intent.putExtra("NUMBER_OF_PEOPLE", numberOfPeople)
+                    context.startActivity(intent)
+                } else {
+                    Toast.makeText(context, "Please fill in all details.", Toast.LENGTH_SHORT).show()
+                }
                 },
                 modifier = Modifier
                     .align(Alignment.End)
