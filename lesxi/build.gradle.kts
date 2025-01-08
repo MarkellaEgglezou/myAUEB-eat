@@ -7,7 +7,7 @@ buildscript {
 
     dependencies {
         // Add the Google Services Gradle plugin classpath
-        classpath("com.google.gms:google-services:4.4.2")  // Specify the plugin version
+        classpath("com.google.gms:google-services:4.4.2")
     }
 }
 
