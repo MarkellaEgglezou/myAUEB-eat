@@ -5,23 +5,38 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicSecureTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.TextObfuscationMode
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -31,13 +46,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
@@ -47,7 +66,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginRegisterScreen(navcontroller: NavHostController) {
+fun LoginRegisterScreen(navController: NavHostController) {
     var isLoginMode by remember { mutableStateOf(true) }
     var email by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
@@ -60,196 +79,132 @@ fun LoginRegisterScreen(navcontroller: NavHostController) {
     val scrollState = rememberScrollState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                modifier = Modifier.fillMaxWidth(),
-                colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = Color(0xFF762525),
-                    titleContentColor = Color.White
-                ),
-                scrollBehavior = scrollBehavior,
-                title = {
-                    Text(
-                        "Login/Register",
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                })
-        },
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Spacer(modifier = Modifier.height(60.dp))
-            if (isLoginMode) {
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Email") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Next
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onNext = {
-                            // handle the next action
-                        }
-                    )
-                )
 
-                Spacer(modifier = Modifier.height(16.dp))
+        if (isLoginMode) {
+            Text(
+                text = "Login",
+                fontSize = 24.sp,
+                modifier = Modifier
+                    .padding(16.dp),
+                textAlign = TextAlign.Left,
+                color = Color(0xFF762525)
+            )
 
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Password") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            // handle the done action
-                        }
-                    )
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                TextButton(
-                    onClick = {
-                        isLoginMode = !isLoginMode
-                    }
-                ) {
-                    Text(text = if (isLoginMode) "Don't have an account? Register" else "Already have an account? Login")
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-            }
+            email = genericTextField("Email Address")
+            Spacer(modifier = Modifier.height(16.dp))
 
-            if (!isLoginMode) {
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Email") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Next
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onNext = {
-                            // handle the next action
-                        }
-                    )
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-                OutlinedTextField(
-                    value = am,
-                    onValueChange = { am = it },
-                    label = { Text("AM") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Next
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onNext = {
-                            // handle the next action
-                        }
-                    )
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    label = { Text("Name") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Next
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onNext = {
-                            // handle the next action
-                        }
-                    )
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                OutlinedTextField(
-                    value = surname,
-                    onValueChange = { surname = it },
-                    label = { Text("Surname") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Next
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onNext = {
-                            // handle the next action
-                        }
-                    )
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Password") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            // handle the done action
-                        }
-                    )
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                OutlinedTextField(
-                    value = confirmPassword,
-                    onValueChange = { confirmPassword = it },
-                    label = { Text("Confirm Password") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    visualTransformation = PasswordVisualTransformation()
-                )
-
-
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
+            password = passwordTextField("Password")
+            Spacer(modifier = Modifier.height(16.dp))
 
             Spacer(modifier = Modifier.height(16.dp))
-            if (isLoginMode) {
-                LoginButton(email = email, password = password, navController = navcontroller)
-            } else {
-                RegisterButton(
-                    email = email,
-                    name = name,
-                    surname = surname,
-                    am = am,
-                    password = password,
-                    confirm = confirmPassword
-                )
-            }
+        }
 
+        if (!isLoginMode) {
+            Text(
+                text = "Register",
+                fontSize = 24.sp,
+                modifier = Modifier
+                    .padding(16.dp),
+                textAlign = TextAlign.Left,
+                color = Color(0xFF762525)
+            )
+            email = genericTextField("Email Address")
+
+            Spacer(modifier = Modifier.height(16.dp))
+            am = genericTextField("AM")
+            Spacer(modifier = Modifier.height(16.dp))
+            name = genericTextField("First Name")
+            Spacer(modifier = Modifier.height(16.dp))
+            surname = genericTextField("Last Name")
+            Spacer(modifier = Modifier.height(16.dp))
+            password = passwordTextField("Password")
+            Spacer(modifier = Modifier.height(16.dp))
+            confirmPassword = passwordTextField("Confirm Password")
+
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+        TextButton(
+            onClick = {
+                isLoginMode = !isLoginMode
+            }
+        ) {
+            Text(text =
+            if (isLoginMode)
+                "Don't have an account? Register"
+            else
+                "Already have an account? Login",
+                color = Color(0xFF762525))
+        }
+        if (isLoginMode) {
+            LoginButton(email = email, password = password, navController = navController)
+        } else {
+            RegisterButton(
+                email = email,
+                name = name,
+                surname = surname,
+                am = am,
+                password = password,
+                confirm = confirmPassword
+            )
         }
 
     }
+
 }
 
+@Composable
+fun genericTextField(fieldType: String): String {
+    var typeTextField by remember { mutableStateOf("") }
+    OutlinedTextField(
+        value = typeTextField,
+        onValueChange = { typeTextField = it },
+        label = { Text(fieldType) },
+        placeholder = { Text(fieldType) },
+        modifier = Modifier.fillMaxWidth(),
+        singleLine = true,
+        leadingIcon = { Icon(Icons.Default.Person, contentDescription = null)},
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Next
+        )
+    )
+    return typeTextField
+}
+
+@Composable
+fun passwordTextField(fieldType: String): String {
+    var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
+
+    OutlinedTextField(
+        value = password,
+        onValueChange = { password = it },
+        label = { Text(fieldType) },
+        placeholder = { Text(fieldType) },
+        modifier = Modifier.fillMaxWidth(),
+        leadingIcon = {
+            val icon = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
+            Icon(
+                imageVector = icon,
+                contentDescription =
+                if (passwordVisible)
+                    "Hide password"
+                else
+                    "Show password",
+                modifier = Modifier.clickable { passwordVisible = !passwordVisible }
+            )
+        },
+        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation()
+    )
+    return password
+}
 @Composable
 fun LoginButton(modifier: Modifier = Modifier, email: String, password: String, navController: NavHostController) {
     val context = LocalContext.current
