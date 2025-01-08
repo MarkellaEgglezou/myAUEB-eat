@@ -8,14 +8,18 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.BookmarkAdd
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.rounded.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
@@ -37,23 +41,23 @@ fun BottomNavigationBar(navController: NavController) {
 
 
         BottomNavigationItem(
-            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+            icon = { Icon(Icons.Default.Home, contentDescription = "Home", tint = Color.White) },
             selected = false,
             onClick = { navController.navigate(Routes.main_page) }
         )
         BottomNavigationItem(
-            icon = { Icon(Icons.Default.Search, contentDescription = "Menu") },
+            icon = { Icon(Icons.Default.AddCircle, contentDescription = "Add Reservation", tint = Color.White) },
             selected = false,
             onClick = { navController.navigate(Routes.reservation_page) }
         )
         BottomNavigationItem(
-            icon = { Icon(Icons.Default.Call, contentDescription = "Forms") },
+            icon = { Icon(Icons.Default.BookmarkAdd, contentDescription = "Complaint Form", tint = Color.White) },
             selected = false,
             onClick = { navController.navigate(Routes.form) }
         )
 
         BottomNavigationItem(
-            icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
+            icon = { Icon(Icons.Default.Person, contentDescription = "Profile", tint = Color.White)},
             selected = false,
             onClick = { navController.navigate(Routes.user) }
         )
@@ -72,15 +76,10 @@ fun NavigationGraph(navController: NavHostController, modifier: Modifier) {
         composable(Routes.main_page) { MenuNavigation() }
         composable(Routes.reservation_page) { ReserveTableScreen() }
         composable(Routes.form) {
-            val user = FirebaseAuth.getInstance().currentUser
-            if (user != null) {
-                Form(user)
-            } else {
-                Text(
-                    "You need to login first",
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxSize()
-                )
+            FirebaseAuth.getInstance().currentUser?.let {
+                if (currentUser != null) {
+                    Form(currentUser)
+                }
             }
         }
         composable(Routes.user) { FirebaseAuth.getInstance().currentUser?.let {
