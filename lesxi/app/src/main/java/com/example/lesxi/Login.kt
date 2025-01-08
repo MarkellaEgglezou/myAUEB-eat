@@ -39,6 +39,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
+import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -46,7 +47,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginRegisterScreen() {
+fun LoginRegisterScreen(navcontroller: NavHostController) {
     var isLoginMode by remember { mutableStateOf(true) }
     var email by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
@@ -232,7 +233,7 @@ fun LoginRegisterScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
             if (isLoginMode) {
-                LoginButton(email = email, password = password)
+                LoginButton(email = email, password = password, navController = navcontroller)
             } else {
                 RegisterButton(
                     email = email,
@@ -250,7 +251,7 @@ fun LoginRegisterScreen() {
 }
 
 @Composable
-fun LoginButton(modifier: Modifier = Modifier, email: String, password: String) {
+fun LoginButton(modifier: Modifier = Modifier, email: String, password: String, navController: NavHostController) {
     val context = LocalContext.current
     Column (
         modifier = modifier
@@ -258,7 +259,7 @@ fun LoginButton(modifier: Modifier = Modifier, email: String, password: String) 
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         androidx.compose.material3.Button(onClick = {
-            loginUser(email, password, appContext = context)
+            loginUser(email, password, appContext = context, navController = navController)
         }, colors = buttonColors(Color(0xFF762525)))
         {
             Text("Login")
@@ -287,18 +288,14 @@ fun RegisterButton(modifier: Modifier = Modifier, email: String, password: Strin
     }
 }
 
-private fun loginUser(email: String, password: String, appContext: Context) {
+private fun loginUser(email: String, password: String, appContext: Context, navController: NavHostController) {
     FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
         .addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                val intent = Intent(appContext, MainActivity::class.java)
-                appContext.startActivity(intent)
-
-                if (appContext is Activity) {
-                    appContext.finish()  // Close the current activity
-                }
+                navController.navigate(Routes.main_page)
 
                 Toast.makeText(appContext, "User Login In Successfully", Toast.LENGTH_SHORT).show()
+
 
             } else {
                 Toast.makeText(appContext, "Login Failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
