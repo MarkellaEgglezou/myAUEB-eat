@@ -44,10 +44,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.lesxi.ui.theme.LesxiTheme
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import java.time.LocalDate
@@ -78,6 +80,7 @@ fun MenuNavigation() {
         }
     }
 }
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -94,7 +97,7 @@ fun MenuLesxi(navController: NavHostController) {
     fun fetchDishesForDay(day: String) {
         isLoading = true
         db.collection("Menu")
-            .whereEqualTo("day", day)  // Query based on day
+            .whereEqualTo("day", day)
             .get()
             .addOnSuccessListener { snapshot ->
                 items = snapshot.documents.mapNotNull { it.toObject<MenuItem>() }
@@ -105,11 +108,11 @@ fun MenuLesxi(navController: NavHostController) {
                 isLoading = false
             }
     }
-
-
     LaunchedEffect(selectedDay) {
         fetchDishesForDay(selectedDay)
     }
+
+
 
     if (isLoading) {
         CircularProgressIndicator()
@@ -180,7 +183,7 @@ fun DaysMenu(selectedDay: String, onDaySelected: (String) -> Unit) {
 
     LazyRow(
         modifier = Modifier.padding(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(3.dp)
     ) {
         items(daysOfWeek) { day ->
             DayTag(day = day, isSelected = day == selectedDay) {
@@ -198,7 +201,7 @@ fun DayTag(day: String, isSelected: Boolean, onClick: () -> Unit) {
                 color = if (isSelected) Color(0xFF762525) else Color(0xFFEEEEEE),
                 shape = RoundedCornerShape(16.dp)
             )
-            .padding(horizontal = 12.dp, vertical = 4.dp)
+            .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         Text(
             text = day,
@@ -237,7 +240,7 @@ fun MenuItems(item: MenuItem, navController: NavHostController) {
                 textAlign = TextAlign.Center,
                 color = Color.White
             )
-            Icon(Icons.Default.KeyboardArrowRight, contentDescription = "see more")
+            Icon(Icons.Default.KeyboardArrowRight, contentDescription = "see more", tint = Color.White)
         }
         Text(
             text = item.description,
@@ -253,4 +256,11 @@ fun MenuItems(item: MenuItem, navController: NavHostController) {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun MenuPreview() {
+    LesxiTheme {
+        MenuNavigation()
+    }
+}
 
