@@ -53,6 +53,7 @@ android {
 }
 
 dependencies {
+    implementation("androidx.compose.material:material-icons-extended:1.7.6")
     implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
