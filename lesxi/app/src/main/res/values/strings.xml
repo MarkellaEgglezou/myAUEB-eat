@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">lesxi</string>
+    <string name="app_name">myAUEB eat</string>
     <string name="title_activity_complaint_form">ComplaintFormActivity</string>
     <string name="complaint_category">What is your complaint category?</string>
     <string name="complaint">What is your complaint?</string>

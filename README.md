@@ -8,7 +8,6 @@
 
 Marina Gkolfinopoulou
 Markella Englezou
-Ellie Papastergiou
 Maria Chrysochoou
 
 ## License
