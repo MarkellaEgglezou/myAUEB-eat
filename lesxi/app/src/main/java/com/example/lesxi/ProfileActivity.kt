@@ -130,7 +130,7 @@ fun ProfileScreen(firebaseUser: FirebaseUser) {
     }
 
     if (user != null) {
-        UserProfile(user!!, reservations, complaints)
+        UserProfile(firebaseUser.uid, user!!, reservations, complaints)
     }
     else {
         Text(
@@ -205,6 +205,7 @@ fun fetchAllData(am: String, onComplete: (List<Reservation>, List<Complaint>) ->
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfile(
+    uid: String,
     user: User,
     reservations: List<Reservation>,
     complaints: List<Complaint>
@@ -235,7 +236,7 @@ fun UserProfile(
             ) {
                 // User Info
                 item {
-                    UserInfo(user)
+                    UserInfo(uid, user)
                 }
 
                 item {
@@ -289,7 +290,7 @@ fun ProfilePicture() {
 }
 
 @Composable
-fun UserInfo(user: User) {
+fun UserInfo(uid: String, user: User) {
     val context = LocalContext.current
     var showEditDialog by remember { mutableStateOf(false) }
 
@@ -348,7 +349,7 @@ fun UserInfo(user: User) {
     }
 
     if (showEditDialog) {
-        EditUserDialog(user = user) {
+        EditUserDialog(uid, user = user) {
             showEditDialog = false
         }
     }
@@ -481,10 +482,9 @@ fun ComplaintList(complaints: List<Complaint>) {
 }
 
 @Composable
-fun EditUserDialog(user: User, onDismiss: () -> Unit) {
+fun EditUserDialog(uid: String, user: User, onDismiss: () -> Unit) {
     var name by remember { mutableStateOf(user.name) }
     var surname by remember { mutableStateOf(user.surname) }
-    var email by remember { mutableStateOf(user.email) }
 
     androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -511,11 +511,6 @@ fun EditUserDialog(user: User, onDismiss: () -> Unit) {
                     onValueChange = { surname = it },
                     label = { Text("Surname") }
                 )
-                androidx.compose.material3.OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Email") }
-                )
 
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -525,8 +520,9 @@ fun EditUserDialog(user: User, onDismiss: () -> Unit) {
                         colors = buttonColors(Color(0xFF762525)),
                         onClick = {
                         // Save the changes
-                        // TODO: Add your update logic here
-                        onDismiss()
+                            val updatedUser = user.copy(name = name, surname = surname)
+                            updateUser(uid, updatedUser)
+                            onDismiss()
                     }) {
                         Text("Save")
                     }
@@ -539,4 +535,23 @@ fun EditUserDialog(user: User, onDismiss: () -> Unit) {
             }
         }
     }
+}
+
+fun updateUser(uid: String, user: User) {
+    val db = FirebaseFirestore.getInstance()
+    val userCollection = db.collection("User")
+    val userDocument = userCollection.document(uid)
+
+    val userMap = mapOf(
+        "name" to user.name,
+        "surname" to user.surname,
+    )
+
+    userDocument.update(userMap)
+        .addOnSuccessListener {
+            println("User updated successfully")
+        }
+        .addOnFailureListener { e ->
+            println("Error updating user: ${e.message}")
+        }
 }
