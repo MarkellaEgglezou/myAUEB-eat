@@ -1,5 +1,6 @@
 package com.example.lesxi
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
@@ -14,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -93,7 +95,5 @@ fun NavigationGraph(navController: NavHostController, modifier: Modifier) {
                 }
             }
         }
-        composable(Routes.random) { DisplayUserDetailsWithAttributes() }
-
     }
 }

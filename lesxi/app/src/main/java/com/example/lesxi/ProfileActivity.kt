@@ -63,15 +63,14 @@ data class User(
 )
 
 data class Reservation(
-    val reservationId: Int = 0,
+    val reservation_id: Int = 0,
     val am: String = "",
-    val diningOption: String = "",
-    val tableId: Int = 0,
+    val dining_option: String = "",
+    val table_id: Int = 0,
     val timestamp: Timestamp? = null
 )
 
 data class Complaint(
-    val complaintId: Int = 0,
     val am: String = "",
     val category: String = "",
     val complaint: String = "",
@@ -115,11 +114,11 @@ fun ProfileScreen(firebaseUser: FirebaseUser) {
     // Fetch all data
     if (am == null) {
         LaunchedEffect(firebaseUser.uid) {
-            fetchAm(firebaseUser.uid) { fetchedAm ->
-                am = fetchedAm
+            fetchUser(firebaseUser.uid) { fetchedUser ->
+                user = fetchedUser
+                am = user?.am
                 if (am != null) {
-                    fetchAllData(firebaseUser.uid, am!!) { fetchedUser, fetchedReservations, fetchedComplaints ->
-                        user = fetchedUser
+                    fetchAllData(am!!) {fetchedReservations, fetchedComplaints ->
                         reservations = fetchedReservations
                         complaints = fetchedComplaints
                     }
@@ -133,14 +132,14 @@ fun ProfileScreen(firebaseUser: FirebaseUser) {
     }
     else {
         Text(
-            "User not found",
+            "Loading...",
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxSize()
         )
     }
 }
 
-fun fetchAm(uid: String, onComplete: (String?) -> Unit) {
+fun fetchUser(uid: String, onComplete: (User?) -> Unit) {
     val db = FirebaseFirestore.getInstance()
 
     db.collection("User")
@@ -148,7 +147,7 @@ fun fetchAm(uid: String, onComplete: (String?) -> Unit) {
         .get()
         .addOnSuccessListener { documents ->
             val user = documents.firstOrNull()?.toObject(User::class.java)
-            onComplete(user?.am)
+            onComplete(user)
         }
         .addOnFailureListener { exception ->
             println("Error getting AM: $exception")
@@ -156,37 +155,23 @@ fun fetchAm(uid: String, onComplete: (String?) -> Unit) {
         }
 }
 
-fun fetchAllData(uid: String, am: String, onComplete: (User?, List<Reservation>, List<Complaint>) -> Unit) {
+fun fetchAllData(am: String, onComplete: (List<Reservation>, List<Complaint>) -> Unit) {
     val db = FirebaseFirestore.getInstance()
 
     // Initialize the results
-    var user: User? = null
     var reservations: List<Reservation> = listOf()
     var complaints: List<Complaint> = listOf()
 
     // Counter to ensure all async operations complete
     var completedTasks = 0
-    val totalTasks = 4
+    val totalTasks = 2
 
     fun checkCompletion() {
         completedTasks++
         if (completedTasks == totalTasks) {
-            onComplete(user, reservations, complaints)
+            onComplete(reservations, complaints)
         }
     }
-
-    // Fetch User
-    db.collection("User")
-        .whereEqualTo("user_id", uid)
-        .get()
-        .addOnSuccessListener { documents ->
-            user = documents.firstOrNull()?.toObject(User::class.java)
-            checkCompletion()
-        }
-        .addOnFailureListener { exception ->
-            println("Error getting user: $exception")
-            checkCompletion()
-        }
 
     // Fetch Reservations
     db.collection("Reservation")
@@ -392,8 +377,8 @@ fun ReservationList(reservations: List<Reservation>) {
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(formatTimestamp(reservations[0].timestamp))
-                        Text("Table: ${reservations[0].tableId}")
-                        Text("Dining Option: ${reservations[0].diningOption}")
+                        Text("Table: ${reservations[0].table_id}")
+                        Text("Dining Option: ${reservations[0].dining_option}")
                     }
                 }
             }
@@ -419,8 +404,8 @@ fun ReservationList(reservations: List<Reservation>) {
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(formatTimestamp(reservation.timestamp))
-                                Text("Table: ${reservation.tableId}")
-                                Text("Dining Option: ${reservation.diningOption}")
+                                Text("Table: ${reservation.table_id}")
+                                Text("Dining Option: ${reservation.dining_option}")
                             }
                         }
                     }
