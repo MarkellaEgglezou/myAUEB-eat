@@ -56,7 +56,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 data class User(
-    val am: Int = 0,
+    val am: String = "",
     val name: String = "",
     val surname: String = "",
     val email: String = ""
@@ -64,7 +64,7 @@ data class User(
 
 data class Reservation(
     val reservationId: Int = 0,
-    val am: Int = 0,
+    val am: String = "",
     val diningOption: String = "",
     val tableId: Int = 0,
     val timestamp: Timestamp? = null
@@ -72,7 +72,7 @@ data class Reservation(
 
 data class Complaint(
     val complaintId: Int = 0,
-    val am: Int = 0,
+    val am: String = "",
     val category: String = "",
     val complaint: String = "",
     val timestamp: Timestamp? = null
@@ -107,7 +107,7 @@ class ProfileActivity : ComponentActivity() {
 
 @Composable
 fun ProfileScreen(firebaseUser: FirebaseUser) {
-    var am by remember { mutableStateOf<Int?>(null) }
+    var am by remember { mutableStateOf<String?>(null) }
     var user by remember { mutableStateOf<User?>(null) }
     var reservations by remember { mutableStateOf(listOf<Reservation>()) }
     var complaints by remember { mutableStateOf(listOf<Complaint>()) }
@@ -118,7 +118,7 @@ fun ProfileScreen(firebaseUser: FirebaseUser) {
             fetchAm(firebaseUser.uid) { fetchedAm ->
                 am = fetchedAm
                 if (am != null) {
-                    fetchAllData(am!!) { fetchedUser, fetchedReservations, fetchedComplaints ->
+                    fetchAllData(firebaseUser.uid, am!!) { fetchedUser, fetchedReservations, fetchedComplaints ->
                         user = fetchedUser
                         reservations = fetchedReservations
                         complaints = fetchedComplaints
@@ -128,22 +128,23 @@ fun ProfileScreen(firebaseUser: FirebaseUser) {
         }
     }
 
-    if (am != null) {
-        UserProfile(user, reservations, complaints)
-    } else {
+    if (user != null) {
+        UserProfile(user!!, reservations, complaints)
+    }
+    else {
         Text(
-            "Loading...",
+            "User not found",
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxSize()
         )
     }
 }
 
-fun fetchAm(uid: String, onComplete: (Int?) -> Unit) {
+fun fetchAm(uid: String, onComplete: (String?) -> Unit) {
     val db = FirebaseFirestore.getInstance()
 
     db.collection("User")
-        .whereEqualTo("uid", uid)
+        .whereEqualTo("user_id", uid)
         .get()
         .addOnSuccessListener { documents ->
             val user = documents.firstOrNull()?.toObject(User::class.java)
@@ -155,7 +156,7 @@ fun fetchAm(uid: String, onComplete: (Int?) -> Unit) {
         }
 }
 
-fun fetchAllData(am: Int, onComplete: (User?, List<Reservation>, List<Complaint>) -> Unit) {
+fun fetchAllData(uid: String, am: String, onComplete: (User?, List<Reservation>, List<Complaint>) -> Unit) {
     val db = FirebaseFirestore.getInstance()
 
     // Initialize the results
@@ -176,7 +177,7 @@ fun fetchAllData(am: Int, onComplete: (User?, List<Reservation>, List<Complaint>
 
     // Fetch User
     db.collection("User")
-        .whereEqualTo("am", am)
+        .whereEqualTo("user_id", uid)
         .get()
         .addOnSuccessListener { documents ->
             user = documents.firstOrNull()?.toObject(User::class.java)
@@ -217,15 +218,10 @@ fun fetchAllData(am: Int, onComplete: (User?, List<Reservation>, List<Complaint>
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfile(
-    user: User?,
+    user: User,
     reservations: List<Reservation>,
     complaints: List<Complaint>
     ) {
-    if (user == null) {
-        Text("Loading user data...", modifier = Modifier.fillMaxSize(),
-            textAlign = TextAlign.Center)
-        return
-    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -322,7 +318,7 @@ fun UserInfo(user: User) {
             modifier = Modifier.weight(1f)
         ) {
             Text("${user.name} ${user.surname}", style = MaterialTheme.typography.bodyLarge)
-            Text("${user.am}", style = MaterialTheme.typography.bodySmall)
+            Text(user.am, style = MaterialTheme.typography.bodySmall)
             Text(user.email, style = MaterialTheme.typography.bodySmall)
         }
 

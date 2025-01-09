@@ -47,7 +47,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 data class ComplaintRecord(
     val complaintId: Int = 0,
-    val am: Int = 0,
+    val am: String = "",
     val category: String = "",
     val complaint: String = "",
     val timestamp: Timestamp? = null
@@ -82,7 +82,7 @@ class ComplaintFormActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Form(firebaseUser: FirebaseUser) {
-    var am by remember { mutableIntStateOf(0) }
+    var am by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(firebaseUser.uid) {
         fetchAm(firebaseUser.uid) { fetchedAm ->
             am = fetchedAm!!
@@ -224,7 +224,7 @@ fun Form(firebaseUser: FirebaseUser) {
 
                         if (!selectedCategoryError.value && !complaintError.value) {
                             submitComplaintToFirebase(
-                                am,
+                                am!!,
                                 selectedCategory.value,
                                 complaint.value,
                                 context
@@ -262,7 +262,7 @@ fun SubmitButton(
     }
 }
 
-fun submitComplaintToFirebase(am: Int, category: String, complaint: String,  context: Context) {
+fun submitComplaintToFirebase(am: String, category: String, complaint: String,  context: Context) {
     val firestore = FirebaseFirestore.getInstance()
 
     val complaintRecord = ComplaintRecord(

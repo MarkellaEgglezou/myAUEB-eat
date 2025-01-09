@@ -79,14 +79,28 @@ fun NavigationGraph(navController: NavHostController, modifier: Modifier) {
             FirebaseAuth.getInstance().currentUser?.let {
                 if (currentUser != null) {
                     Form(currentUser)
+                } else {
+                    androidx.compose.material3.Text(
+                        "User not found",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxSize()
+                    )
                 }
             }
         }
-        composable(Routes.user) { FirebaseAuth.getInstance().currentUser?.let {
-            if (currentUser != null) {
-                ProfileScreen(currentUser)
+        composable(Routes.user) {
+            FirebaseAuth.getInstance().currentUser?.let {
+                if (currentUser != null) {
+                    ProfileScreen(currentUser)
+                } else {
+                    androidx.compose.material3.Text(
+                        "User not found",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
-        } }
+        }
         composable(Routes.random) { DisplayUserDetailsWithAttributes() }
 
     }
