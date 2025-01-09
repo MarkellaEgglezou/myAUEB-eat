@@ -27,8 +27,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,14 +44,6 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
-
-data class ComplaintRecord(
-    val complaintId: Int = 0,
-    val am: String = "",
-    val category: String = "",
-    val complaint: String = "",
-    val timestamp: Timestamp? = null
-)
 
 class ComplaintFormActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,10 +75,19 @@ class ComplaintFormActivity : ComponentActivity() {
 @Composable
 fun Form(firebaseUser: FirebaseUser) {
     var am by remember { mutableStateOf<String?>(null) }
+    var user by remember { mutableStateOf<User?>(null) }
     LaunchedEffect(firebaseUser.uid) {
-        fetchAm(firebaseUser.uid) { fetchedAm ->
-            am = fetchedAm!!
+        fetchUser(firebaseUser.uid) { fetchedUser ->
+            user = fetchedUser
+            am = user?.am
         }
+    }
+
+    if (am == null) {
+        Text("AM not found",
+            modifier = Modifier.fillMaxSize(),
+            textAlign = TextAlign.Center)
+        return
     }
 
     val complaintCategories = listOf(
@@ -230,7 +231,10 @@ fun Form(firebaseUser: FirebaseUser) {
                                 context
                             )
                         }
-                    }
+                    },
+                    selectedCategory = selectedCategory,
+                    complaint = complaint,
+                    photo = photo
                 )
             }
         }
@@ -251,10 +255,18 @@ fun EditTextField(value: String, onValueChange: (String) -> Unit, isError: Boole
 @Composable
 fun SubmitButton(
     onSubmit: () -> Unit,
+    selectedCategory: MutableState<String>,
+    complaint: MutableState<String>,
+    photo: MutableState<String>,
     modifier: Modifier = Modifier
 ) {
     Button(
-        onClick = onSubmit,
+        onClick = {
+            onSubmit()
+            selectedCategory.value = ""
+            complaint.value = ""
+            photo.value = ""
+        },
         colors = buttonColors(Color(0xFF762525)),
         modifier = modifier
     ) {
@@ -263,16 +275,16 @@ fun SubmitButton(
 }
 
 fun submitComplaintToFirebase(am: String, category: String, complaint: String,  context: Context) {
-    val firestore = FirebaseFirestore.getInstance()
+    val db = FirebaseFirestore.getInstance()
 
-    val complaintRecord = ComplaintRecord(
+    val complaintRecord = Complaint(
         am = am,
         category = category,
         complaint = complaint,
         timestamp = Timestamp.now()
     )
 
-    firestore.collection("Complaint")
+    db.collection("Complaint")
         .add(complaintRecord)
         .addOnSuccessListener {
             Toast.makeText(context, "Complaint submitted successfully",
