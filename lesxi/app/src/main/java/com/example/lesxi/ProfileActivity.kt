@@ -291,6 +291,8 @@ fun ProfilePicture() {
 @Composable
 fun UserInfo(user: User) {
     val context = LocalContext.current
+    var showEditDialog by remember { mutableStateOf(false) }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
@@ -321,7 +323,7 @@ fun UserInfo(user: User) {
                 modifier = Modifier
                     .size(24.dp)
                     .clickable {
-                        /* TODO */
+                        showEditDialog = true
                     }
             )
 
@@ -342,6 +344,12 @@ fun UserInfo(user: User) {
                         (context as Activity).finish()
                     }
             )
+        }
+    }
+
+    if (showEditDialog) {
+        EditUserDialog(user = user) {
+            showEditDialog = false
         }
     }
 }
@@ -465,6 +473,67 @@ fun ComplaintList(complaints: List<Complaint>) {
                                 Text("Complaint: ${complaint.complaint}")
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun EditUserDialog(user: User, onDismiss: () -> Unit) {
+    var name by remember { mutableStateOf(user.name) }
+    var surname by remember { mutableStateOf(user.surname) }
+    var email by remember { mutableStateOf(user.email) }
+
+    androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.background,
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(text = "Edit Profile", style = MaterialTheme.typography.titleMedium)
+
+                // Input fields for name, surname, and email
+                androidx.compose.material3.OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Name") }
+                )
+                androidx.compose.material3.OutlinedTextField(
+                    value = surname,
+                    onValueChange = { surname = it },
+                    label = { Text("Surname") }
+                )
+                androidx.compose.material3.OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Email") }
+                )
+
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Button(
+                        colors = buttonColors(Color(0xFF762525)),
+                        onClick = {
+                        // Save the changes
+                        // TODO: Add your update logic here
+                        onDismiss()
+                    }) {
+                        Text("Save")
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Button(colors = buttonColors(Color(0xFF762525)),
+                        onClick = onDismiss) {
+                        Text("Cancel")
                     }
                 }
             }
