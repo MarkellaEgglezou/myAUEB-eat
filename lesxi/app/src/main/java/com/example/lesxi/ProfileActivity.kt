@@ -1,5 +1,7 @@
 package com.example.lesxi
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -332,8 +334,12 @@ fun UserInfo(user: User) {
                 modifier = Modifier
                     .size(24.dp)
                     .clickable {
-                        FirebaseAuth.getInstance().signOut()
                         Toast.makeText(context, "Logout successful", Toast.LENGTH_SHORT).show()
+                        // Restart the app
+                        val intent = Intent(context, MainActivity::class.java)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+                        context.startActivity(intent)
+                        (context as Activity).finish()
                     }
             )
         }
