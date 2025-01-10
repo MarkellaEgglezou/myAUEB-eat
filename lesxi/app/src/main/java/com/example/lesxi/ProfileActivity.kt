@@ -2,11 +2,14 @@ package com.example.lesxi
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -43,14 +46,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberImagePainter
 import com.example.lesxi.ui.theme.LesxiTheme
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -102,6 +108,38 @@ class ProfileActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+    }
+    // Override onActivityResult to handle image selection result
+    @Deprecated("This method has been deprecated in favor of using the Activity Result API\n      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt\n      contracts for common intents available in\n      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for\n      testing, and allow receiving results in separate, testable classes independent from your\n      activity. Use\n      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}\n      with the appropriate {@link ActivityResultContract} and handling the result in the\n      {@link ActivityResultCallback#onActivityResult(Object) callback}.")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        val pickImage = 1000
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK && requestCode == pickImage) {
+            val imageUri = data?.data
+            // Upload the image to Firebase Storage
+            imageUri?.let { uploadImageToFirebase(it) }
+        }
+    }
+
+    private fun uploadImageToFirebase(imageUri: Uri) {
+        val storageRef = FirebaseStorage.getInstance().reference.child("profile_images/${FirebaseAuth.getInstance().currentUser?.uid}.jpg")
+        val uploadTask = storageRef.putFile(imageUri)
+
+        uploadTask.addOnSuccessListener {
+            storageRef.downloadUrl.addOnSuccessListener { uri ->
+                val db = FirebaseFirestore.getInstance()
+                val userRef = db.collection("User").document(FirebaseAuth.getInstance().currentUser?.uid ?: "")
+                userRef.update("avatar_photo", uri.toString())
+                    .addOnSuccessListener {
+                        println("Profile Picture Updated")
+                    }
+                    .addOnFailureListener { e ->
+                        println("Failed to Update Profile Picture: ${e.message}")
+                    }
+            }
+        }.addOnFailureListener { e ->
+            println("Image Upload Failed: ${e.message}")
         }
     }
 }
@@ -272,9 +310,10 @@ fun UserProfile(
 }
 
 @Composable
-fun ProfilePicture() {
-    // Replace with actual profile picture logic
-    val painter = painterResource(id = R.drawable.ic_launcher_foreground)
+fun ProfilePicture(imageUri: Uri?, onImageClick: () -> Unit) {
+    val painter = imageUri?.let {
+        rememberImagePainter(data = it)
+    } ?: painterResource(id = R.drawable.ic_launcher_foreground) // Default image
 
     Surface(
         shape = CircleShape,
@@ -283,7 +322,11 @@ fun ProfilePicture() {
         Image(
             painter = painter,
             contentDescription = "Profile Picture",
-            modifier = Modifier.size(80.dp),
+            modifier = Modifier
+                .size(100.dp)
+                .clip(CircleShape)
+                .border(1.dp, Color.Black, CircleShape)
+                .clickable { onImageClick() },
             contentScale = ContentScale.Crop
         )
     }
@@ -293,13 +336,18 @@ fun ProfilePicture() {
 fun UserInfo(uid: String, user: User) {
     val context = LocalContext.current
     var showEditDialog by remember { mutableStateOf(false) }
+    val imageUri by remember { mutableStateOf<Uri?>(null) }
+    val pickImage = 1000
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
     ) {
         // Profile Picture
-        ProfilePicture()
+        ProfilePicture(imageUri = imageUri) {
+            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            (context as Activity).startActivityForResult(intent, pickImage)
+        }
 
         Spacer(modifier = Modifier.width(16.dp))
 
