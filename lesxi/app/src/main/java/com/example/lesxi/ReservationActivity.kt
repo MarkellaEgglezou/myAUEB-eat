@@ -1,41 +1,28 @@
 package com.example.lesxi
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
-import android.app.TimePickerDialog
-import android.content.Intent
 import android.os.Bundle
-import android.text.Layout
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,20 +30,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.lesxi.ui.theme.LesxiTheme
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-
 import java.util.Calendar
 
 class ReservationActivity : ComponentActivity() {
@@ -325,7 +307,8 @@ fun ReserveTableScreen(navController: NavController) {
                     val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
                     val date = LocalDate.parse(selectedDate, formatter)
                     val day = date.dayOfWeek
-                    navController.navigate(Routes.showMeals +"/${day}/${reservationDetails}")
+
+                    navController.navigate(Routes.showMeals +"/${day}/${selectedDate}/${selectedTime}/${numberOfPeople}")
                 } else {
                     Toast.makeText(context, "Please fill in all details.", Toast.LENGTH_SHORT).show()
                 }
@@ -344,20 +327,27 @@ fun ReserveTableScreen(navController: NavController) {
     }
 }
 
+@SuppressLint("NewApi")
 @Composable
 fun ReserveNavigation() {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = Routes.reserveDetails) {
         composable(Routes.reserveDetails) { ReserveTableScreen(navController) }
-        composable(Routes.showMeals+"/{day}/{reservationDetails}") { backStackEntry ->
+        composable(Routes.showMeals+"/{day}/{date}/{time}/{people}") { backStackEntry ->
             val day = backStackEntry.arguments?.getString("day") ?: "UNKNOWN"
-            ShowMenuItems(day)
+            val date = backStackEntry.arguments?.getString("date") ?: "UNKNOWN"
+            val time = backStackEntry.arguments?.getString("time") ?: "UNKNOWN"
+            val people = backStackEntry.arguments?.getString("people") ?: "UNKNOWN"
+
+            ShowMenuItems(day, date, time, people)
         }
-        composable("confirmation/{items}/{reservationDetails}") { backStackEntry ->
-            val items = backStackEntry.arguments?.getString("items")
-            ConfirmationScreen(items, ) { }
-            val reservationDetails = backStackEntry.arguments?.getParcelable<ReservationDetails>("reservationDetails")
+        composable("confirmation/{items}/{date}/{time}/{people}") { backStackEntry ->
+            val date = backStackEntry.arguments?.getString("date") ?: "UNKNOWN"
+            val time = backStackEntry.arguments?.getString("time") ?: "UNKNOWN"
+            val people = backStackEntry.arguments?.getString("people") ?: "UNKNOWN"
+            val items = backStackEntry.arguments?.getStringArrayList("items")
+            ConfirmationScreen(date,time, people, items)
 
         }
     }

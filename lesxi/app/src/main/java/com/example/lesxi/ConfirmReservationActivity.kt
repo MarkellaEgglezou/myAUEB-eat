@@ -1,17 +1,13 @@
 package com.example.lesxi
 
-import androidx.compose.ui.tooling.preview.Preview
 
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,7 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.lesxi.ui.theme.LesxiTheme
+import java.util.ArrayList
 
 class ConfirmReservationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,10 +37,12 @@ data class ReservationDetails(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConfirmationScreen(
-    reservationDetails: ReservationDetails?,
-    items: List<MenuItem>,
-    onConfirm: () -> Unit,
-    onBack: () -> Unit
+    date: String,
+    time: String,
+    people: String,
+    items: ArrayList<String>?,
+//    onConfirm: () -> Unit,
+//    onBack: () -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
@@ -85,6 +83,7 @@ fun ConfirmationScreen(
             )
 
             Spacer(modifier = Modifier.height(48.dp))
+            val reservationDetails = ReservationDetails(date, time, people)
             reservationDetails?.let {
                 DetailRow(label = "Date:", value = it.date)
                 Spacer(modifier = Modifier.height(48.dp))
@@ -102,7 +101,7 @@ fun ConfirmationScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(
-                    onClick = onBack,
+                    onClick = { TODO() },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF762525),
                         contentColor = Color.White
@@ -112,7 +111,7 @@ fun ConfirmationScreen(
                 }
 
                 Button(
-                    onClick = onConfirm,
+                    onClick = { TODO() },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF762525),
                         contentColor = Color.White

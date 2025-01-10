@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults.buttonColors
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material3.Card
@@ -29,12 +30,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 
 
 @Composable
-fun ShowMenuItems(day: String) {
+fun ShowMenuItems(day: String, date: String, time: String, people: String) {
     println(day)
     val dayMap = mapOf(
         "MONDAY" to "Mon",
@@ -48,6 +50,7 @@ fun ShowMenuItems(day: String) {
     val dayReserve = dayMap[day]
     val itemsForDay = dayReserve?.let { fetchDishesForDay(it) }
     val scrollState = rememberScrollState()
+    val navController = rememberNavController()
 
 
     val itemCheckedStates = remember { mutableListOf<MutableState<Boolean>>() }
@@ -82,9 +85,10 @@ fun ShowMenuItems(day: String) {
                 checkedItems?.forEach {
                     println("Checked item: ${it.title}")
                 }
-
+                navController.navigate(Routes.finishReservation +"/${checkedItems}/${date}/${time}/${people}")
             },
-            modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+            colors = buttonColors(Color(0xFF762525))
         ) {
             Text("Next")
         }
