@@ -328,33 +328,6 @@ fun ReserveTableScreen(navController: NavController) {
     }
 }
 
-@SuppressLint("NewApi")
-@Composable
-fun ReserveNavigation() {
-    val navController = rememberNavController()
-
-    NavHost(navController = navController, startDestination = Routes.reserveDetails) {
-        composable(Routes.reserveDetails) { ReserveTableScreen(navController) }
-        composable(Routes.showMeals+"/{day}") { backStackEntry ->
-            val day = backStackEntry.arguments?.getString("day") ?: "UNKNOWN"
-
-//            {date}/{time}/{people}
-//            val date = backStackEntry.arguments?.getString("date") ?: "UNKNOWN"
-//            val time = backStackEntry.arguments?.getString("time") ?: "UNKNOWN"
-//            val people = backStackEntry.arguments?.getString("people") ?: "UNKNOWN"
-
-            ShowMenuItems(day)
-        }
-        composable("confirmation/{items}/{date}/{time}/{people}") { backStackEntry ->
-//            val date = backStackEntry.arguments?.getString("date") ?: "UNKNOWN"
-//            val time = backStackEntry.arguments?.getString("time") ?: "UNKNOWN"
-//            val people = backStackEntry.arguments?.getString("people") ?: "UNKNOWN"
-//            val items = backStackEntry.arguments?.getStringArrayList("items")
-//            ConfirmationScreen(date,time, people, items)
-
-        }
-    }
-}
 
 
 

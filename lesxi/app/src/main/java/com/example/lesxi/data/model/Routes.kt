@@ -1,4 +1,4 @@
-package com.example.lesxi
+package com.example.lesxi.data.model
 
 object Routes {
     var main_page = "home"

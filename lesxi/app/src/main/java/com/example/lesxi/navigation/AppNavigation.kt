@@ -1,4 +1,4 @@
-package com.example.lesxi
+package com.example.lesxi.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -21,6 +21,11 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.lesxi.Form
+import com.example.lesxi.LoginRegisterScreen
+import com.example.lesxi.ProfileScreen
+import com.example.lesxi.navigation.*
+import com.example.lesxi.data.model.Routes
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable

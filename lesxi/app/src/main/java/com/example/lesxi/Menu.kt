@@ -44,9 +44,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import java.util.Calendar
@@ -54,20 +51,7 @@ import com.example.lesxi.data.model.*
 
 
 
-@Composable
-fun MenuNavigation() {
-    val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Routes.main_page) {
-        composable(Routes.main_page) {
-            MenuLesxi(navController = navController)
-        }
-        composable(Routes.menuItemDetails+ "/{itemID}") { backStackEntry ->
-            val itemID = backStackEntry.arguments?.getString("itemID") ?: ""
-            MenuItemDetailsScreen(itemID)
-        }
-    }
-}
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
