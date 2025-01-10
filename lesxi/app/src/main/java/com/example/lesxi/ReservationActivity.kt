@@ -308,7 +308,7 @@ fun ReserveTableScreen(navController: NavController) {
                     val date = LocalDate.parse(selectedDate, formatter)
                     val day = date.dayOfWeek
 
-                    navController.navigate(Routes.showMeals +"/${day}/${selectedDate}/${selectedTime}/${numberOfPeople}")
+                    navController.navigate(Routes.showMeals +"/${day}")
                 } else {
                     Toast.makeText(context, "Please fill in all details.", Toast.LENGTH_SHORT).show()
                 }
@@ -334,20 +334,22 @@ fun ReserveNavigation() {
 
     NavHost(navController = navController, startDestination = Routes.reserveDetails) {
         composable(Routes.reserveDetails) { ReserveTableScreen(navController) }
-        composable(Routes.showMeals+"/{day}/{date}/{time}/{people}") { backStackEntry ->
+        composable(Routes.showMeals+"/{day}") { backStackEntry ->
             val day = backStackEntry.arguments?.getString("day") ?: "UNKNOWN"
-            val date = backStackEntry.arguments?.getString("date") ?: "UNKNOWN"
-            val time = backStackEntry.arguments?.getString("time") ?: "UNKNOWN"
-            val people = backStackEntry.arguments?.getString("people") ?: "UNKNOWN"
 
-            ShowMenuItems(day, date, time, people)
+//            {date}/{time}/{people}
+//            val date = backStackEntry.arguments?.getString("date") ?: "UNKNOWN"
+//            val time = backStackEntry.arguments?.getString("time") ?: "UNKNOWN"
+//            val people = backStackEntry.arguments?.getString("people") ?: "UNKNOWN"
+
+            ShowMenuItems(day)
         }
         composable("confirmation/{items}/{date}/{time}/{people}") { backStackEntry ->
-            val date = backStackEntry.arguments?.getString("date") ?: "UNKNOWN"
-            val time = backStackEntry.arguments?.getString("time") ?: "UNKNOWN"
-            val people = backStackEntry.arguments?.getString("people") ?: "UNKNOWN"
-            val items = backStackEntry.arguments?.getStringArrayList("items")
-            ConfirmationScreen(date,time, people, items)
+//            val date = backStackEntry.arguments?.getString("date") ?: "UNKNOWN"
+//            val time = backStackEntry.arguments?.getString("time") ?: "UNKNOWN"
+//            val people = backStackEntry.arguments?.getString("people") ?: "UNKNOWN"
+//            val items = backStackEntry.arguments?.getStringArrayList("items")
+//            ConfirmationScreen(date,time, people, items)
 
         }
     }

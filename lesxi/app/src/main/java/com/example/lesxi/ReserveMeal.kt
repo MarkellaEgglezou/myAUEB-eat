@@ -36,7 +36,7 @@ import com.google.firebase.firestore.toObject
 
 
 @Composable
-fun ShowMenuItems(day: String, date: String, time: String, people: String) {
+fun ShowMenuItems(day: String) {
     println(day)
     val dayMap = mapOf(
         "MONDAY" to "Mon",
@@ -85,12 +85,12 @@ fun ShowMenuItems(day: String, date: String, time: String, people: String) {
                 checkedItems?.forEach {
                     println("Checked item: ${it.title}")
                 }
-                navController.navigate(Routes.finishReservation +"/${checkedItems}/${date}/${time}/${people}")
+//                navController.navigate(Routes.finishReservation +"/${checkedItems}")
             },
             modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
             colors = buttonColors(Color(0xFF762525))
         ) {
-            Text("Next")
+            Text("Next", color= Color.White)
         }
     }
 
