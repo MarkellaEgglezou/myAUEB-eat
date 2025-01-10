@@ -100,7 +100,6 @@ fun Form(firebaseUser: FirebaseUser) {
     val selectedCategory = remember { mutableStateOf("") }
     val isDropdownExpanded = remember { mutableStateOf(false) }
     val complaint = remember { mutableStateOf("") }
-    val photo = remember { mutableStateOf("") }
 
     val selectedCategoryError = remember { mutableStateOf(false) }
     val complaintError = remember { mutableStateOf(false) }
@@ -133,6 +132,7 @@ fun Form(firebaseUser: FirebaseUser) {
             ) {
                 Text(
                     text = stringResource(R.string.complaint_category),
+                    style = androidx.compose.material.MaterialTheme.typography.h6,
                     modifier = Modifier
                         .padding(bottom = 16.dp)
                         .align(Alignment.Start)
@@ -178,6 +178,7 @@ fun Form(firebaseUser: FirebaseUser) {
 
                 Text(
                     text = stringResource(R.string.complaint),
+                    style = androidx.compose.material.MaterialTheme.typography.h6,
                     modifier = Modifier
                         .padding(bottom = 16.dp, top = 40.dp)
                         .align(Alignment.Start)
@@ -201,21 +202,6 @@ fun Form(firebaseUser: FirebaseUser) {
                     )
                 }
 
-                Text(
-                    text = stringResource(R.string.upload_photo),
-                    modifier = Modifier
-                        .padding(bottom = 16.dp, top = 40.dp)
-                        .align(Alignment.Start)
-                )
-                EditTextField(
-                    value = photo.value,
-                    onValueChange = { photo.value = it },
-                    isError = false,
-                    modifier = Modifier
-                        .padding(bottom = 32.dp)
-                        .fillMaxWidth()
-                )
-
                 Spacer(modifier = Modifier.height(40.dp))
                 val context = LocalContext.current
                 SubmitButton (
@@ -233,8 +219,7 @@ fun Form(firebaseUser: FirebaseUser) {
                         }
                     },
                     selectedCategory = selectedCategory,
-                    complaint = complaint,
-                    photo = photo
+                    complaint = complaint
                 )
             }
         }
@@ -257,7 +242,6 @@ fun SubmitButton(
     onSubmit: () -> Unit,
     selectedCategory: MutableState<String>,
     complaint: MutableState<String>,
-    photo: MutableState<String>,
     modifier: Modifier = Modifier
 ) {
     Button(
@@ -265,7 +249,6 @@ fun SubmitButton(
             onSubmit()
             selectedCategory.value = ""
             complaint.value = ""
-            photo.value = ""
         },
         colors = buttonColors(Color(0xFF762525)),
         modifier = modifier
