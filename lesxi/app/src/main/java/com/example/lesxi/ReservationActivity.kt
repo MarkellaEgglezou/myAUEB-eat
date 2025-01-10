@@ -40,6 +40,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
+import com.example.lesxi.data.model.*
 
 class ReservationActivity : ComponentActivity() {
 

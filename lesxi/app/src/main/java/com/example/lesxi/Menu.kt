@@ -41,26 +41,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.lesxi.ui.theme.LesxiTheme
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import java.util.Calendar
-
-data class MenuItem(
-    val itemID: String = "",
-    val title: String = "",
-    val description: String = "",
-    val allergens: List<String> = emptyList(),
-    val imageUrl: String = "",
-    val day: String = ""
-)
+import com.example.lesxi.data.model.*
 
 
 

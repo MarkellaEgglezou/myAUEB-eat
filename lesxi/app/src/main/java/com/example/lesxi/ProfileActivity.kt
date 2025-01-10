@@ -62,28 +62,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import java.text.SimpleDateFormat
 import java.util.Locale
+import com.example.lesxi.data.model.*
 
-data class User(
-    val am: String = "",
-    val name: String = "",
-    val surname: String = "",
-    val email: String = ""
-)
 
-data class Reservation(
-    val reservation_id: Int = 0,
-    val am: String = "",
-    val dining_option: String = "",
-    val table_id: Int = 0,
-    val timestamp: Timestamp? = null
-)
-
-data class Complaint(
-    val am: String = "",
-    val category: String = "",
-    val complaint: String = "",
-    val timestamp: Timestamp? = null
-)
 
 class ProfileActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
