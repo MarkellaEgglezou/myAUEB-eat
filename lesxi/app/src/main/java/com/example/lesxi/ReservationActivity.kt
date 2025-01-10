@@ -47,6 +47,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.lesxi.ui.theme.LesxiTheme
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -60,7 +64,7 @@ class ReservationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ReserveTableScreen()
+//            ReserveTableScreen()
         }
     }
 }
@@ -75,7 +79,7 @@ fun isToday(dateString: String): Boolean {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReserveTableScreen() {
+fun ReserveTableScreen(navController: NavController) {
     // State variables for user input
     var selectedDate by remember { mutableStateOf("Choose Date") }
     var selectedTime by remember { mutableStateOf("Choose Time") }
@@ -197,7 +201,7 @@ fun ReserveTableScreen() {
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         availableSlots.forEach { time -> val isSelected = currentSelectedTime == time
-                            androidx.compose.material3.Button(
+                            Button(
                                 onClick = {
                                     currentSelectedTime = time
                                     onTimeSelected(time)
@@ -207,7 +211,7 @@ fun ReserveTableScreen() {
                                     contentColor = Color.White
                                 )
                             ) {
-                                androidx.compose.material3.Text(text = time)
+                                Text(text = time)
                             }
                         }
                     }
@@ -311,16 +315,17 @@ fun ReserveTableScreen() {
 
             Spacer(modifier = Modifier.weight(1f))
             Button(
-                onClick = {if (selectedDate != "Choose Date" && selectedTime.value.isNotEmpty()) { //pass arguments to test file ConfirmationActivity.kt
-                    val intent = Intent(context, ConfirmationActivity::class.java)
-
-                    // Pass number of people based on the "Take Out" toggle state
+                onClick = {if (selectedDate != "Choose Date" && selectedTime.value.isNotEmpty()) {
                     val numberOfPeople = if (isDisabled) "0" else selectedText
+                    val reservationDetails = ReservationDetails(
+                        date = selectedDate, time = selectedTime.toString(),
+                        numberOfPeople = numberOfPeople,
+                    )
 
-                    intent.putExtra("SELECTED_DATE", selectedDate)
-                    intent.putExtra("SELECTED_TIME", selectedTime.value)
-                    intent.putExtra("NUMBER_OF_PEOPLE", numberOfPeople)
-                    context.startActivity(intent)
+                    val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
+                    val date = LocalDate.parse(selectedDate, formatter)
+                    val day = date.dayOfWeek
+                    navController.navigate(Routes.showMeals +"/${day}/${reservationDetails}")
                 } else {
                     Toast.makeText(context, "Please fill in all details.", Toast.LENGTH_SHORT).show()
                 }
@@ -339,11 +344,22 @@ fun ReserveTableScreen() {
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun ReserveTableScreenPreview() {
-    LesxiTheme {
-        ReservationActivity()
+fun ReserveNavigation() {
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = Routes.reserveDetails) {
+        composable(Routes.reserveDetails) { ReserveTableScreen(navController) }
+        composable(Routes.showMeals+"/{day}/{reservationDetails}") { backStackEntry ->
+            val day = backStackEntry.arguments?.getString("day") ?: "UNKNOWN"
+            ShowMenuItems(day)
+        }
+        composable("confirmation/{items}/{reservationDetails}") { backStackEntry ->
+            val items = backStackEntry.arguments?.getString("items")
+            ConfirmationScreen(items, ) { }
+            val reservationDetails = backStackEntry.arguments?.getParcelable<ReservationDetails>("reservationDetails")
+
+        }
     }
 }
 

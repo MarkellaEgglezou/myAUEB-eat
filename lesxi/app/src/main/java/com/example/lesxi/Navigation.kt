@@ -68,7 +68,7 @@ fun NavigationGraph(navController: NavHostController, modifier: Modifier) {
     ) {
         composable(Routes.login) { LoginRegisterScreen(navController) }
         composable(Routes.main_page) { MenuNavigation() }
-        composable(Routes.reservation_page) { ReserveTableScreen() }
+        composable(Routes.reservation_page) { ReserveNavigation() }
         composable(Routes.form) {
             FirebaseAuth.getInstance().currentUser?.let {
                 if (currentUser != null) {

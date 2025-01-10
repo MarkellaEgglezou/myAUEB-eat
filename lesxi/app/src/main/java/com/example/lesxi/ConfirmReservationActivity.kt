@@ -27,15 +27,7 @@ class ConfirmReservationActivity : ComponentActivity() {
         val reservationDetails = intent.getSerializableExtra("reservationDetails") as? ReservationDetails
 
         setContent {
-            ConfirmationScreen(
-                reservationDetails = reservationDetails,
-                onConfirm = {
-                    //TODO//
-                },
-                onBack = {
-                    //TODO//
-                }
-            )
+
         }
     }
 }
@@ -44,13 +36,13 @@ data class ReservationDetails(
     val date: String,
     val time: String,
     val numberOfPeople: String,
-    val table: String = "Default Table" // Optional table details
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConfirmationScreen(
     reservationDetails: ReservationDetails?,
+    items: List<MenuItem>,
     onConfirm: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -100,7 +92,7 @@ fun ConfirmationScreen(
                 Spacer(modifier = Modifier.height(48.dp))
                 DetailRow(label = "People:", value = it.numberOfPeople)
                 Spacer(modifier = Modifier.height(48.dp))
-                DetailRow(label = "Table:", value = it.table)
+//                DetailRow(label = "Table:", value = it.table)
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -154,19 +146,18 @@ fun DetailRow(label: String, value: String) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ConfirmationScreenPreview() {
-    LesxiTheme {
-        ConfirmationScreen(
-            reservationDetails = ReservationDetails(
-                date = "12/29/2024",
-                time = "7:00 PM",
-                numberOfPeople = "4",
-                table = "Table 5"
-            ),
-            onConfirm = {},
-            onBack = {}
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun ConfirmationScreenPreview() {
+//    LesxiTheme {
+//        ConfirmationScreen(
+//            reservationDetails = ReservationDetails(
+//                date = "12/29/2024",
+//                time = "7:00 PM",
+//                numberOfPeople = "4",
+//            ),
+//            onConfirm = {},
+//            onBack = {}
+//        )
+//    }
+//}

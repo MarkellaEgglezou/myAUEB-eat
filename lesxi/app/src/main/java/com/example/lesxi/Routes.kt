@@ -8,5 +8,7 @@ object Routes {
     var menu = "menu"
     var menuItemDetails = "menu_items_details"
     var login = "login"
-    var random = "random"
+    var showMeals = "showMeals"
+    var reserveDetails = "reserveDetails"
+    var finishReservation = "finishReservation"
 }
