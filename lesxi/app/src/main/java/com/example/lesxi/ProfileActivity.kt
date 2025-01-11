@@ -8,6 +8,7 @@ import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,10 +24,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.Card
@@ -65,6 +70,7 @@ import java.util.Locale
 import com.example.lesxi.data.model.*
 import com.example.lesxi.data.*
 import com.example.lesxi.view.MainActivity
+import com.google.firebase.auth.UserProfileChangeRequest
 
 class ProfileActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,39 +95,6 @@ class ProfileActivity : ComponentActivity() {
                     }
                 }
             }
-        }
-    }
-
-    // Override onActivityResult to handle image selection result
-    @Deprecated("This method has been deprecated in favor of using the Activity Result API\n      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt\n      contracts for common intents available in\n      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for\n      testing, and allow receiving results in separate, testable classes independent from your\n      activity. Use\n      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}\n      with the appropriate {@link ActivityResultContract} and handling the result in the\n      {@link ActivityResultCallback#onActivityResult(Object) callback}.")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        val pickImage = 1000
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK && requestCode == pickImage) {
-            val imageUri = data?.data
-            // Upload the image to Firebase Storage
-            imageUri?.let { uploadImageToFirebase(it) }
-        }
-    }
-
-    private fun uploadImageToFirebase(imageUri: Uri) {
-        val storageRef = FirebaseStorage.getInstance().reference.child("profile_images/${FirebaseAuth.getInstance().currentUser?.uid}.jpg")
-        val uploadTask = storageRef.putFile(imageUri)
-
-        uploadTask.addOnSuccessListener {
-            storageRef.downloadUrl.addOnSuccessListener { uri ->
-                val db = FirebaseFirestore.getInstance()
-                val userRef = db.collection("User").document(FirebaseAuth.getInstance().currentUser?.uid ?: "")
-                userRef.update("avatar_photo", uri.toString())
-                    .addOnSuccessListener {
-                        println("Profile Picture Updated")
-                    }
-                    .addOnFailureListener { e ->
-                        println("Failed to Update Profile Picture: ${e.message}")
-                    }
-            }
-        }.addOnFailureListener { e ->
-            println("Image Upload Failed: ${e.message}")
         }
     }
 }
@@ -231,24 +204,55 @@ fun UserProfile(
 }
 
 @Composable
-fun ProfilePicture(imageUri: Uri?, onImageClick: () -> Unit) {
-    val painter = imageUri?.let {
-        rememberImagePainter(data = it)
-    } ?: painterResource(id = R.drawable.ic_launcher_foreground) // Default image
+fun ProfilePicture(
+    user: User,
+    onAvatarSelected: (String) -> Unit
+) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    // Avatar selection dialog triggered by clicking the profile picture
+    if (showDialog) {
+        AvatarSelectionDialog(
+            onAvatarSelected = { avatarName ->
+                onAvatarSelected(avatarName)
+                showDialog = false
+            },
+            onDismiss = { showDialog = false }
+        )
+    }
+
+    // Determine which image to show based on user.avatar_photo
+    val painter = if (user.avatar_photo.isNotEmpty()) {
+        // Dynamically load the avatar image based on the avatar name
+        val avatarResId = when (user.avatar_photo) {
+            "bear" -> R.drawable.bear
+            "cat" -> R.drawable.cat
+            "koala" -> R.drawable.koala
+            "lion" -> R.drawable.lion
+            "meerkat" -> R.drawable.meerkat
+            "panda" -> R.drawable.panda
+            "polar_bear" -> R.drawable.polar_bear
+            "puffer_fish" -> R.drawable.puffer_fish
+            "sea_lion" -> R.drawable.sea_lion
+            else -> R.drawable.ic_launcher_foreground // Default image in case of an unexpected value
+        }
+        painterResource(id = avatarResId)
+    } else {
+        painterResource(id = R.drawable.ic_launcher_foreground) // Fallback image
+    }
 
     Surface(
         shape = CircleShape,
-        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+        modifier = Modifier
+            .size(80.dp)
+            .clickable { showDialog = true } // Open the dialog when clicked
     ) {
         Image(
             painter = painter,
             contentDescription = "Profile Picture",
-            modifier = Modifier
-                .size(100.dp)
-                .clip(CircleShape)
-                .border(1.dp, Color.Black, CircleShape)
-                .clickable { onImageClick() },
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
         )
     }
 }
@@ -257,18 +261,22 @@ fun ProfilePicture(imageUri: Uri?, onImageClick: () -> Unit) {
 fun UserInfo(uid: String, user: User) {
     val context = LocalContext.current
     var showEditDialog by remember { mutableStateOf(false) }
-    val imageUri by remember { mutableStateOf<Uri?>(null) }
-    val pickImage = 1000
+    var newUser by remember { mutableStateOf(User()) } // Assuming a User class exists
+    var selectedAvatar by remember { mutableStateOf<String?>(null) }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
     ) {
         // Profile Picture
-        ProfilePicture(imageUri = imageUri) {
-            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            (context as Activity).startActivityForResult(intent, pickImage)
-        }
+        ProfilePicture(
+            user,
+            onAvatarSelected = { avatarName ->
+                newUser = user.copy(avatar_photo = avatarName)
+                selectedAvatar = avatarName
+                updateUserProfilePicture(uid, newUser)
+            }
+        )
 
         Spacer(modifier = Modifier.width(16.dp))
 
@@ -503,5 +511,120 @@ fun EditUserDialog(uid: String, user: User, onDismiss: () -> Unit) {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun AvatarSelectionDialog(
+    onAvatarSelected: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    // List of avatar names
+    val avatars = listOf(
+        "bear",
+        "cat",
+        "koala",
+        "lion",
+        "meerkat",
+        "panda",
+        "polar_bear",
+        "puffer_fish",
+        "sea_lion"
+    )
+
+    // Change selectedAvatar to store the name of the avatar
+    var selectedAvatar by remember { mutableStateOf<String?>(null) }
+
+    androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.background,
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(text = "Select Your Avatar", style = MaterialTheme.typography.titleMedium)
+
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items(avatars) { avatar ->
+                        AvatarItem(
+                            avatar = avatar,
+                            isSelected = avatar == selectedAvatar,
+                            onClick = {
+                                selectedAvatar = avatar
+                                // Don't dismiss the dialog here
+                            }
+                        )
+                    }
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Button(
+                        colors = buttonColors(Color(0xFF762525)),
+                        onClick = {
+                            // Only proceed if an avatar is selected
+                            if (selectedAvatar != null) {
+                                onAvatarSelected(selectedAvatar!!) // Pass the selected avatar name
+                            }
+                            onDismiss() // Close the dialog when Save is clicked
+                        }
+                    ) {
+                        Text("Save")
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Button(
+                        colors = buttonColors(Color(0xFF762525)),
+                        onClick = onDismiss // Just dismiss when Cancel is clicked
+                    ) {
+                        Text("Cancel")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AvatarItem(avatar: String, isSelected: Boolean, onClick: () -> Unit) {
+    Card(
+        shape = CircleShape,
+        border = if (isSelected) BorderStroke(2.dp, Color.Blue) else null,
+        modifier = Modifier
+            .padding(8.dp)
+            .size(80.dp)
+            .clickable { onClick() } // Clicking on an avatar will update the selection, but not dismiss the dialog
+    ) {
+        // Assuming the images are named the same as the avatar strings (e.g., "bear", "cat", etc.)
+        val imageId = when (avatar) {
+            "bear" -> R.drawable.bear
+            "cat" -> R.drawable.cat
+            "koala" -> R.drawable.koala
+            "lion" -> R.drawable.lion
+            "meerkat" -> R.drawable.meerkat
+            "panda" -> R.drawable.panda
+            "polar_bear" -> R.drawable.polar_bear
+            "puffer_fish" -> R.drawable.puffer_fish
+            "sea_lion" -> R.drawable.sea_lion
+            else -> R.drawable.bear // Default avatar in case of an error
+        }
+
+        Image(
+            painter = painterResource(id = imageId),
+            contentDescription = "Avatar",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
     }
 }

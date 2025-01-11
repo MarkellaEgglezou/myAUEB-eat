@@ -84,3 +84,21 @@ fun updateUser(uid: String, user: User) {
             println("Error updating user: ${e.message}")
         }
 }
+
+fun updateUserProfilePicture(uid: String, user: User) {
+    val db = FirebaseFirestore.getInstance()
+    val userCollection = db.collection("User")
+    val userDocument = userCollection.document(uid)
+
+    val userMap = mapOf(
+        "avatar_photo" to user.avatar_photo
+    )
+
+    userDocument.update(userMap)
+        .addOnSuccessListener {
+            println("User updated successfully")
+        }
+        .addOnFailureListener { e ->
+            println("Error updating user: ${e.message}")
+        }
+}
