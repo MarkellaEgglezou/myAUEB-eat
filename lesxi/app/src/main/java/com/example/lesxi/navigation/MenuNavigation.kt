@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.lesxi.MenuItemDetailsScreen
-import com.example.lesxi.MenuLesxi
+import com.example.lesxi.view.MenuItemDetailsScreen
+import com.example.lesxi.view.MenuLexi
 import com.example.lesxi.data.model.Routes
 
 @Composable
@@ -14,11 +14,11 @@ fun MenuNavigation() {
 
     NavHost(navController = navController, startDestination = Routes.main_page) {
         composable(Routes.main_page) {
-            MenuLesxi(navController = navController)
+            MenuLexi(navController = navController)
         }
         composable(Routes.menuItemDetails+ "/{itemID}") { backStackEntry ->
             val itemID = backStackEntry.arguments?.getString("itemID") ?: ""
-            MenuItemDetailsScreen(itemID)
+            MenuItemDetailsScreen(itemID = itemID, navController = navController)
         }
     }
 }

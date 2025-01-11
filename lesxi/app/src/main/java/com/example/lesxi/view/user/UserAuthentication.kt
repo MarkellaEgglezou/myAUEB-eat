@@ -1,4 +1,4 @@
-package com.example.lesxi
+package com.example.lesxi.view.user
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -40,7 +41,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.lesxi.R
 import com.example.lesxi.data.model.Routes
+import com.example.lesxi.view.MainActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -68,7 +71,7 @@ fun LoginRegisterScreen(navController: NavHostController) {
 
         if (isLoginMode) {
             Text(
-                text = "Login",
+                text = stringResource(R.string.login),
                 fontSize = 24.sp,
                 modifier = Modifier
                     .padding(16.dp),
@@ -76,10 +79,10 @@ fun LoginRegisterScreen(navController: NavHostController) {
                 color = Color(0xFF762525)
             )
 
-            email = genericTextField("Email Address")
+            email = genericTextField(stringResource(R.string.email))
             Spacer(modifier = Modifier.height(16.dp))
 
-            password = passwordTextField("Password")
+            password = passwordTextField(stringResource(R.string.password))
             Spacer(modifier = Modifier.height(16.dp))
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -87,25 +90,25 @@ fun LoginRegisterScreen(navController: NavHostController) {
 
         if (!isLoginMode) {
             Text(
-                text = "Register",
+                text = stringResource(R.string.register),
                 fontSize = 24.sp,
                 modifier = Modifier
                     .padding(16.dp),
                 textAlign = TextAlign.Left,
                 color = Color(0xFF762525)
             )
-            email = genericTextField("Email Address")
+            email = genericTextField(stringResource(R.string.email))
 
             Spacer(modifier = Modifier.height(16.dp))
-            am = genericTextField("AM")
+            am = genericTextField(stringResource(R.string.am))
             Spacer(modifier = Modifier.height(16.dp))
-            name = genericTextField("First Name")
+            name = genericTextField(stringResource(R.string.name))
             Spacer(modifier = Modifier.height(16.dp))
-            surname = genericTextField("Last Name")
+            surname = genericTextField(stringResource(R.string.surname))
             Spacer(modifier = Modifier.height(16.dp))
-            password = passwordTextField("Password")
+            password = passwordTextField(stringResource(R.string.password))
             Spacer(modifier = Modifier.height(16.dp))
-            confirmPassword = passwordTextField("Confirm Password")
+            confirmPassword = passwordTextField(stringResource(R.string.c_password))
 
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -114,11 +117,12 @@ fun LoginRegisterScreen(navController: NavHostController) {
                 isLoginMode = !isLoginMode
             }
         ) {
-            Text(text =
-            if (isLoginMode)
-                "Don't have an account? Register"
-            else
-                "Already have an account? Login",
+            Text(
+                text =
+                    if (isLoginMode)
+                        stringResource(R.string.link_to_register)
+                    else
+                        stringResource(R.string.link_to_login),
                 color = Color(0xFF762525))
         }
         if (isLoginMode) {
@@ -195,7 +199,7 @@ fun LoginButton(modifier: Modifier = Modifier, email: String, password: String, 
             loginUser(email, password, appContext = context, navController = navController)
         }, colors = buttonColors(Color(0xFF762525)))
         {
-            Text("Login")
+            Text(stringResource(R.string.login))
         }
     }
 }
@@ -216,7 +220,7 @@ fun RegisterButton(modifier: Modifier = Modifier, email: String, password: Strin
                 registerUser(email = email, name=name, surname=surname, am=am, password = password, appContext = context)
             }
         }, colors = buttonColors(Color(0xFF762525)) ){
-            Text("Register")
+            Text(stringResource(R.string.register))
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.example.lesxi
+package com.example.lesxi.view
 
 
 import android.annotation.SuppressLint
@@ -19,14 +19,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -40,23 +40,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.lesxi.R
+import com.example.lesxi.data.model.MenuItem
+import com.example.lesxi.data.model.Routes
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import java.util.Calendar
-import com.example.lesxi.data.model.*
-
-
-
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MenuLesxi(navController: NavHostController) {
+fun MenuLexi(navController: NavHostController) {
     val db = FirebaseFirestore.getInstance()
     var items by remember { mutableStateOf<List<MenuItem>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
@@ -100,7 +100,7 @@ fun MenuLesxi(navController: NavHostController) {
                     ),
                     title = {
                         Text(
-                            "Menu",
+                            text = stringResource(R.string.menu_title),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -121,7 +121,11 @@ fun MenuLesxi(navController: NavHostController) {
                 Spacer(modifier = Modifier.height(20.dp))
 
                 if (items.isEmpty()) {
-                    Text("No dishes available for this day.")
+                    Text(
+                        text = stringResource(R.string.no_avail),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
 
                 items.forEach { item ->
@@ -178,12 +182,12 @@ fun DayTag(day: String, isSelected: Boolean, onClick: () -> Unit) {
                 color = if (isSelected) Color(0xFF762525) else Color(0xFFEEEEEE),
                 shape = RoundedCornerShape(16.dp)
             )
-            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .padding(horizontal = 10.dp, vertical = 4.dp)
     ) {
         Text(
             text = day,
             color = if (isSelected) Color.White else Color.Black,
-            style = MaterialTheme.typography.body1
+            style = MaterialTheme.typography.bodySmall
         )
     }
 }
@@ -205,7 +209,7 @@ fun MenuItems(item: MenuItem, navController: NavHostController) {
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start,
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
 
         ) {
@@ -217,14 +221,18 @@ fun MenuItems(item: MenuItem, navController: NavHostController) {
                 textAlign = TextAlign.Center,
                 color = Color.White
             )
-            Icon(Icons.Default.KeyboardArrowRight, contentDescription = "see more", tint = Color.White)
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = stringResource(R.string.see_meal_details),
+                tint = Color.White,
+                modifier = Modifier.padding(16.dp)
+            )
         }
         Text(
             text = item.description,
             fontSize = 12.sp,
             modifier = Modifier
                 .padding(16.dp),
-            textAlign = TextAlign.Center,
+            textAlign = TextAlign.Start,
             color = Color.White
         )
 

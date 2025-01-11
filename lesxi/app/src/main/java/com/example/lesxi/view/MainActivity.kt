@@ -1,4 +1,4 @@
-package com.example.lesxi
+package com.example.lesxi.view
 
 
 import android.os.Bundle
@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import com.example.lesxi.view.user.LoginRegisterScreen
 import com.example.lesxi.navigation.BottomNavigationBar
 import com.example.lesxi.navigation.NavigationGraph
 import com.google.firebase.firestore.FirebaseFirestore

@@ -1,18 +1,27 @@
-package com.example.lesxi
+package com.example.lesxi.view
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonDefaults.buttonColors
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -26,11 +35,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.lesxi.R
 import com.example.lesxi.data.model.MenuItem
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -38,7 +50,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MenuItemDetailsScreen(itemID: String) {
+fun MenuItemDetailsScreen(itemID: String, navController: NavController) {
     val db = FirebaseFirestore.getInstance()
     var item by remember { mutableStateOf<MenuItem?>(null) }
     var isLoading by remember { mutableStateOf(true) }
@@ -65,13 +77,20 @@ fun MenuItemDetailsScreen(itemID: String) {
             topBar = {
                 TopAppBar(
                     modifier = Modifier.fillMaxWidth(),
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.go_back),
+                                tint = Color.White)
+                        }
+                    },
                     colors = TopAppBarDefaults.mediumTopAppBarColors(
                         containerColor = Color(0xFF762525),
                         titleContentColor = Color.White
                     ),
                     title = {
                         Text(
-                            text = item?.title ?: "Null",
+                            text = item?.title ?: stringResource(R.string.no_avail),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -102,7 +121,7 @@ fun ItemDetails(item: MenuItem){
     val painter = rememberAsyncImagePainter(imageData.imageUrl)
     Image(
         painter = painter,
-        contentDescription = "Mousakas",
+        contentDescription = item.title,
         modifier = Modifier
             .height(200.dp)
             .fillMaxWidth()
@@ -115,24 +134,48 @@ fun ItemDetails(item: MenuItem){
             .padding(bottom = 16.dp, top = 40.dp)
     )
     Text(
-        text = "Αλλεργιογόνα",
+        text = stringResource(R.string.allergens),
         fontSize = 16.sp,
         fontStyle = FontStyle.Italic,
         modifier = Modifier
             .padding(bottom = 16.dp, top = 40.dp)
     )
+
     if (item.allergens.isNotEmpty()) {
-        for (allergen in item.allergens) {
-            Text(text = "- $allergen")
-        }
+        AllergensList(item.allergens)
     } else {
-        Text(text = "Δεν περιλαμβάνονται.")
+        Text(text = stringResource(R.string.not_included))
     }
 
-    androidx.compose.material3.Button(onClick = {
-        TODO()
-    }, colors = buttonColors(Color(0xFF762525)))
-    {
-        Text("Reserve this Meal")
+
+}
+
+@Composable
+fun AllergensList(items: List<String>) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(items.size) { index ->
+            AnimatedVisibility(visible = true) {
+                Card(
+                    shape = RoundedCornerShape(6.dp),
+                    elevation = CardDefaults.cardElevation(4.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFF762525),
+                    ),
+                ) {
+                    Text(
+                        text = items[index],
+                        modifier = Modifier.padding(12.dp),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White
+                    )
+                }
+            }
+        }
     }
 }
+

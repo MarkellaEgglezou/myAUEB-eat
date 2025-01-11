@@ -63,7 +63,7 @@ import com.google.firebase.auth.FirebaseUser
 import java.text.SimpleDateFormat
 import java.util.Locale
 import com.example.lesxi.data.model.*
-
+import com.example.lesxi.view.MainActivity
 
 
 class ProfileActivity : ComponentActivity() {
