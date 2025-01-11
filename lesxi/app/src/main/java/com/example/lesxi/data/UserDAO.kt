@@ -91,7 +91,7 @@ fun updateUserProfilePicture(uid: String, user: User) {
     val userDocument = userCollection.document(uid)
 
     val userMap = mapOf(
-        "avatar_photo" to user.avatar_photo
+        "avatarPhoto" to user.avatarPhoto
     )
 
     userDocument.update(userMap)

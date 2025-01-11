@@ -218,9 +218,9 @@ fun ProfilePicture(
     }
 
     // Determine which image to show based on user.avatar_photo
-    val painter = if (user.avatar_photo.isNotEmpty()) {
+    val painter = if (user.avatarPhoto.isNotEmpty()) {
         // Dynamically load the avatar image based on the avatar name
-        val avatarResId = when (user.avatar_photo) {
+        val avatarResId = when (user.avatarPhoto) {
             "bear" -> R.drawable.bear
             "cat" -> R.drawable.cat
             "koala" -> R.drawable.koala
@@ -268,7 +268,7 @@ fun UserInfo(uid: String, user: User) {
         ProfilePicture(
             user,
             onAvatarSelected = { avatarName ->
-                newUser = user.copy(avatar_photo = avatarName)
+                newUser = user.copy(avatarPhoto = avatarName)
                 selectedAvatar = avatarName
                 updateUserProfilePicture(uid, newUser)
             }

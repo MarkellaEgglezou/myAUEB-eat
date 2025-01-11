@@ -241,6 +241,7 @@ private fun loginUser(email: String, password: String, appContext: Context, navC
 }
 
 private fun registerUser(email: String, name: String, surname: String, am: String, password: String, appContext: Context) {
+    val avatarPhoto: String = "null"
     FirebaseAuth.getInstance().createUserWithEmailAndPassword(email,password)
         .addOnCompleteListener { task ->
             if (task.isSuccessful) {
@@ -251,7 +252,7 @@ private fun registerUser(email: String, name: String, surname: String, am: Strin
                     "am" to am,
                     "name" to name,
                     "surname" to surname,
-                    "avatar_photo" to null
+                    "avatarPhoto" to avatarPhoto
                 )
 
                 // Add data to Firestore
