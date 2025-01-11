@@ -33,6 +33,8 @@
     <string name="link_to_register">Don\'t have an account? Register</string>
     <string name="link_to_login">Already have an account? Login</string>
 
-
-
+    <!-- Reservation Items   -->
+    <string name="add_reservation">Make a Reservation</string>
+    <string name="select_date">Select Reservation Date</string>
+    <string name="select_time">Select Reservation Time</string>
 </resources>

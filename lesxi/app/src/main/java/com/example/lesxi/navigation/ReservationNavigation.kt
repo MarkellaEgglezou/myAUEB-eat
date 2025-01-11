@@ -2,12 +2,18 @@ package com.example.lesxi.navigation
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.lesxi.ConfirmationScreen
 import com.example.lesxi.ReserveTableScreen
 import com.example.lesxi.ShowMenuItems
+import com.example.lesxi.data.model.ReservationDetails
 import com.example.lesxi.data.model.Routes
+import com.google.common.reflect.TypeToken
+import com.google.gson.Gson
 
 
 @SuppressLint("NewApi")
@@ -17,23 +23,40 @@ fun ReserveNavigation() {
 
     NavHost(navController = navController, startDestination = Routes.reserveDetails) {
         composable(Routes.reserveDetails) { ReserveTableScreen(navController) }
-        composable(Routes.showMeals+"/{day}") { backStackEntry ->
-            val day = backStackEntry.arguments?.getString("day") ?: "UNKNOWN"
+        composable(
+            route = Routes.showMeals+"/{day}/{reservationDetails}",
+            arguments = listOf(
+                navArgument("day") { type = NavType.StringType },
+                navArgument("reservationDetails") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val day = backStackEntry.arguments?.getString("day")
+            val json = backStackEntry.arguments?.getString("reservationDetails")
+            val reservationDetails = Gson().fromJson(json, ReservationDetails::class.java)
 
-//            {date}/{time}/{people}
-//            val date = backStackEntry.arguments?.getString("date") ?: "UNKNOWN"
-//            val time = backStackEntry.arguments?.getString("time") ?: "UNKNOWN"
-//            val people = backStackEntry.arguments?.getString("people") ?: "UNKNOWN"
-
-            ShowMenuItems(day)
+            if (day != null) {
+                ShowMenuItems(day = day, navController, reservationDetails)
+            }
         }
-        composable("confirmation/{items}/{date}/{time}/{people}") { backStackEntry ->
-//            val date = backStackEntry.arguments?.getString("date") ?: "UNKNOWN"
-//            val time = backStackEntry.arguments?.getString("time") ?: "UNKNOWN"
-//            val people = backStackEntry.arguments?.getString("people") ?: "UNKNOWN"
-//            val items = backStackEntry.arguments?.getStringArrayList("items")
-//            ConfirmationScreen(date,time, people, items)
 
+        composable(
+            route = Routes.finishReservation+"/{reservationDetails}/{itemsList}",
+            arguments = listOf(
+                navArgument("reservationDetails") { type = NavType.StringType },
+                navArgument("itemsList") { type = NavType.StringType }
+            )
+
+        ) { backStackEntry ->
+            val reservationJson = backStackEntry.arguments?.getString("reservationDetails")
+            val itemsJson = backStackEntry.arguments?.getString("itemsList")
+
+            val reservationDetails = Gson().fromJson(reservationJson, ReservationDetails::class.java)
+            val itemsList = Gson().fromJson<List<String>>(itemsJson, object : TypeToken<List<String>>() {}.type)
+
+            ConfirmationScreen(
+                navController, reservationDetails, itemsList
+            )
+            
         }
     }
 }

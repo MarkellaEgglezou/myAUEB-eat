@@ -1,16 +1,24 @@
 package com.example.lesxi
 
-import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Switch
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -23,34 +31,29 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import com.example.lesxi.data.model.ReservationDetails
+import com.example.lesxi.data.model.Routes
+import com.google.gson.Gson
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
-import com.example.lesxi.data.model.*
 
-class ReservationActivity : ComponentActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-//            ReserveTableScreen()
-        }
-    }
-}
 
 fun isToday(dateString: String): Boolean {
     val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
@@ -63,7 +66,6 @@ fun isToday(dateString: String): Boolean {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReserveTableScreen(navController: NavController) {
-    // State variables for user input
     var selectedDate by remember { mutableStateOf("Choose Date") }
     var selectedTime by remember { mutableStateOf("Choose Time") }
     var numberOfPeople by remember { mutableStateOf("") }
@@ -73,24 +75,28 @@ fun ReserveTableScreen(navController: NavController) {
     var currentSelectedTime by remember { mutableStateOf("") }
     var isDisabled by remember { mutableStateOf(false) }
 
-    // Main UI layout
     Scaffold(
         topBar = {
             TopAppBar(
                 modifier = Modifier.fillMaxWidth(),
-                colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Color(0xFF762525),
+                colors = TopAppBarDefaults.mediumTopAppBarColors(
+                    containerColor = Color(0xFF762525),
                     titleContentColor = Color.White),
                 scrollBehavior = scrollBehavior,
-                title = { Text("Make a Reservation",
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth())})
+                title = {
+                    Text(
+                        text = stringResource(R.string.add_reservation),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            )
         },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                //.verticalScroll(rememberScrollState())
                 .padding(paddingValues)
                 .padding(16.dp),
             verticalArrangement = Arrangement.Top,
@@ -98,12 +104,10 @@ fun ReserveTableScreen(navController: NavController) {
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Date Picker
             Text(
-                text = "Select Reservation Date",
+                text = stringResource(R.string.select_date),
                 style = androidx.compose.material.MaterialTheme.typography.h6,
                 modifier = Modifier.padding(bottom = 16.dp)
-                    //.padding(start = 16.dp)
             )
 
             Button(onClick = {
@@ -140,10 +144,8 @@ fun ReserveTableScreen(navController: NavController) {
                 listOf()
             }
 
-            // get unavailable slots of selectedDate
-            val unavailableSlots = setOf("01:00 PM") // Supposed to be filled by db
+            val unavailableSlots = setOf("01:00 PM")
 
-            // Current time
             val currentTime = LocalTime.now()
             val formatter = DateTimeFormatter.ofPattern("hh:mm a")
             val oneHourLater = currentTime.plusHours(1)
@@ -206,13 +208,14 @@ fun ReserveTableScreen(navController: NavController) {
 
 
                 Text(
-                    text = "Select Reservation Time",
+                    text = stringResource(R.string.select_time),
                     style = androidx.compose.material.MaterialTheme.typography.h6,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
-                // Dropdown Menu for available times
+
+
                 DropdownMenu(
                     availableSlots = availableSlots,
                     selectedTime = selectedTime.value,
@@ -220,7 +223,7 @@ fun ReserveTableScreen(navController: NavController) {
                 )
 
             Spacer(modifier = Modifier.height(24.dp))
-                //People Picker
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -308,8 +311,9 @@ fun ReserveTableScreen(navController: NavController) {
                     val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
                     val date = LocalDate.parse(selectedDate, formatter)
                     val day = date.dayOfWeek
+                    val json = Uri.encode(Gson().toJson(reservationDetails))
 
-                    navController.navigate(Routes.showMeals +"/${day}")
+                    navController.navigate(Routes.showMeals +"/$day/$json")
                 } else {
                     Toast.makeText(context, "Please fill in all details.", Toast.LENGTH_SHORT).show()
                 }
