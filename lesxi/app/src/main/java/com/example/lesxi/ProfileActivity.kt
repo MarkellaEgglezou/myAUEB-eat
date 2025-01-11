@@ -63,8 +63,8 @@ import com.google.firebase.auth.FirebaseUser
 import java.text.SimpleDateFormat
 import java.util.Locale
 import com.example.lesxi.data.model.*
+import com.example.lesxi.data.*
 import com.example.lesxi.view.MainActivity
-
 
 class ProfileActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,6 +91,7 @@ class ProfileActivity : ComponentActivity() {
             }
         }
     }
+
     // Override onActivityResult to handle image selection result
     @Deprecated("This method has been deprecated in favor of using the Activity Result API\n      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt\n      contracts for common intents available in\n      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for\n      testing, and allow receiving results in separate, testable classes independent from your\n      activity. Use\n      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}\n      with the appropriate {@link ActivityResultContract} and handling the result in the\n      {@link ActivityResultCallback#onActivityResult(Object) callback}.")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -158,67 +159,6 @@ fun ProfileScreen(firebaseUser: FirebaseUser) {
             modifier = Modifier.fillMaxSize()
         )
     }
-}
-
-fun fetchUser(uid: String, onComplete: (User?) -> Unit) {
-    val db = FirebaseFirestore.getInstance()
-
-    db.collection("User")
-        .whereEqualTo("user_id", uid)
-        .get()
-        .addOnSuccessListener { documents ->
-            val user = documents.firstOrNull()?.toObject(User::class.java)
-            onComplete(user)
-        }
-        .addOnFailureListener { exception ->
-            println("Error getting AM: $exception")
-            onComplete(null)
-        }
-}
-
-fun fetchAllData(am: String, onComplete: (List<Reservation>, List<Complaint>) -> Unit) {
-    val db = FirebaseFirestore.getInstance()
-
-    // Initialize the results
-    var reservations: List<Reservation> = listOf()
-    var complaints: List<Complaint> = listOf()
-
-    // Counter to ensure all async operations complete
-    var completedTasks = 0
-    val totalTasks = 2
-
-    fun checkCompletion() {
-        completedTasks++
-        if (completedTasks == totalTasks) {
-            onComplete(reservations, complaints)
-        }
-    }
-
-    // Fetch Reservations
-    db.collection("Reservation")
-        .whereEqualTo("am", am)
-        .get()
-        .addOnSuccessListener { documents ->
-            reservations = documents.map { it.toObject(Reservation::class.java) }
-            checkCompletion()
-        }
-        .addOnFailureListener { exception ->
-            println("Error getting reservations: $exception")
-            checkCompletion()
-        }
-
-    // Fetch Complaints
-    db.collection("Complaint")
-        .whereEqualTo("am", am)
-        .get()
-        .addOnSuccessListener { documents ->
-            complaints = documents.map { it.toObject(Complaint::class.java) }
-            checkCompletion()
-        }
-        .addOnFailureListener { exception ->
-            println("Error getting complaint: $exception")
-            checkCompletion()
-        }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -564,23 +504,4 @@ fun EditUserDialog(uid: String, user: User, onDismiss: () -> Unit) {
             }
         }
     }
-}
-
-fun updateUser(uid: String, user: User) {
-    val db = FirebaseFirestore.getInstance()
-    val userCollection = db.collection("User")
-    val userDocument = userCollection.document(uid)
-
-    val userMap = mapOf(
-        "name" to user.name,
-        "surname" to user.surname,
-    )
-
-    userDocument.update(userMap)
-        .addOnSuccessListener {
-            println("User updated successfully")
-        }
-        .addOnFailureListener { e ->
-            println("Error updating user: ${e.message}")
-        }
 }
