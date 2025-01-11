@@ -505,22 +505,3 @@ fun EditUserDialog(uid: String, user: User, onDismiss: () -> Unit) {
         }
     }
 }
-
-fun updateUser(uid: String, user: User) {
-    val db = FirebaseFirestore.getInstance()
-    val userCollection = db.collection("User")
-    val userDocument = userCollection.document(uid)
-
-    val userMap = mapOf(
-        "name" to user.name,
-        "surname" to user.surname,
-    )
-
-    userDocument.update(userMap)
-        .addOnSuccessListener {
-            println("User updated successfully")
-        }
-        .addOnFailureListener { e ->
-            println("Error updating user: ${e.message}")
-        }
-}
