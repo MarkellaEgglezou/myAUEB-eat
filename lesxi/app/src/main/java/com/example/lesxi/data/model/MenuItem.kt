@@ -6,5 +6,6 @@ data class MenuItem(
     val description: String = "",
     val allergens: List<String> = emptyList(),
     val imageUrl: String = "",
-    val day: String = ""
+    val day: String = "",
+    val type: String = ""
 )
