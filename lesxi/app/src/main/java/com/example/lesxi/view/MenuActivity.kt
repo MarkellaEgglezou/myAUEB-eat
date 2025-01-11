@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -74,6 +75,7 @@ fun MenuLexi(navController: NavHostController) {
             .get()
             .addOnSuccessListener { snapshot ->
                 items = snapshot.documents.mapNotNull { it.toObject<MenuItem>() }
+                println("Fetched ${items.size} items for $day")
                 isLoading = false
             }
             .addOnFailureListener { exception ->
@@ -85,7 +87,17 @@ fun MenuLexi(navController: NavHostController) {
         fetchDishesForDay(selectedDay)
     }
 
+    val groupedItems = items.groupBy { it.type }
 
+
+    val typeOrder = listOf("Breakfast", "Appetizer", "Lunch", "Dinner")
+
+
+    val sortedGroupedItems = typeOrder.mapNotNull { type ->
+        groupedItems[type]?.let {
+            type to it
+        }
+    }
 
     if (isLoading) {
         CircularProgressIndicator()
@@ -112,25 +124,33 @@ fun MenuLexi(navController: NavHostController) {
                     .fillMaxSize()
                     .padding(20.dp)
                     .verticalScroll(scrollState),
-                verticalArrangement = Arrangement.Center
             ) {
-
+                Spacer(modifier = Modifier.height(100.dp))
                 DaysMenu(selectedDay = selectedDay) { day ->
                     selectedDay = day
                 }
                 Spacer(modifier = Modifier.height(20.dp))
 
-                if (items.isEmpty()) {
+                if (sortedGroupedItems.isEmpty()) {
                     Text(
                         text = stringResource(R.string.no_avail),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
                     )
-                }
+                } else {
 
-                items.forEach { item ->
-                    MenuItems(item, navController = navController)
-                    Spacer(modifier = Modifier.height(20.dp))
+                    sortedGroupedItems.forEach { (type, items) ->
+                        Text(
+                            text = type,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 18.sp,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                        items.forEach { item ->
+                            MenuItems(item, navController = navController)
+                            Spacer(modifier = Modifier.height(20.dp))
+                        }
+                    }
                 }
             }
         }
@@ -229,7 +249,7 @@ fun MenuItems(item: MenuItem, navController: NavHostController) {
         }
         Text(
             text = item.description,
-            fontSize = 12.sp,
+            fontSize = 8.sp,
             modifier = Modifier
                 .padding(16.dp),
             textAlign = TextAlign.Start,
