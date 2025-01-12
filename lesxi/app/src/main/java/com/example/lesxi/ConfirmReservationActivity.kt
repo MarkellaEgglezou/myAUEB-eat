@@ -4,12 +4,18 @@ package com.example.lesxi
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -37,8 +43,7 @@ fun ConfirmationScreen(
         return
     }
 
-
-
+    val scrollState = rememberScrollState()
     Scaffold(
             topBar = {
 
@@ -70,20 +75,47 @@ fun ConfirmationScreen(
     ) { paddingValues ->
 
 
-        Column(modifier = Modifier.padding(16.dp)) {
-            Spacer(modifier = Modifier.height(60.dp))
-            Text("Reservation Details:")
-            Text("Date: ${reservationDetails.date}")
-            Text("Time: ${reservationDetails.time.substring(19, 27)}")
-            Text("Number of People: ${reservationDetails.numberOfPeople}")
+        Column(modifier = Modifier.padding(16.dp)
+            .verticalScroll(scrollState)) {
+            Spacer(modifier = Modifier.height(75.dp))
+
+            Text(
+                text = "Reservation Details",
+                style = androidx.compose.material.MaterialTheme.typography.h4.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp
+                ),
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
+            // Burgundy Box for form elements
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(0xFF762525))
+                    .padding(16.dp)
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text("Date: ${reservationDetails.date}", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Time: ${reservationDetails.time.substring(19, 27)}", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Number of People: ${reservationDetails.numberOfPeople}", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
 
-            Text("Items:")
-            items.forEach { item ->
-                Text(item)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Items:", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    items.forEach { item ->
+                        Text(item, color = Color.White, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
             }
-
 
             val context = LocalContext.current
 
