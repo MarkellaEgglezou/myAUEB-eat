@@ -364,9 +364,9 @@ fun ReservationList(reservations: List<Reservation>) {
                     shape = MaterialTheme.shapes.medium
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(formatTimestamp(reservations[0].timestamp))
-                        Text("Table: ${reservations[0].table_id}")
-                        Text("Dining Option: ${reservations[0].dining_option}")
+                        Text("Date: ${reservations[0].date}")
+                        Text("Time: ${reservations[0].time}")
+                        Text("Number of People: ${reservations[0].numberOfPeople}")
                     }
                 }
             }
@@ -391,9 +391,9 @@ fun ReservationList(reservations: List<Reservation>) {
                             shape = MaterialTheme.shapes.medium
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
-                                Text(formatTimestamp(reservation.timestamp))
-                                Text("Table: ${reservation.table_id}")
-                                Text("Dining Option: ${reservation.dining_option}")
+                                Text("Date: ${reservation.date}")
+                                Text("Time: ${reservation.time}")
+                                Text("Number of People: ${reservation.numberOfPeople}")
                             }
                         }
                     }
