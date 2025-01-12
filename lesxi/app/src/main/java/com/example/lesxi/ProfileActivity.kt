@@ -350,13 +350,15 @@ fun formatTimestamp(timestamp: Timestamp?): String {
 
 @Composable
 fun ReservationList(reservations: List<Reservation>) {
+    // Sort the reservations by date
+    val sortedReservations = reservations.sortedByDescending { it.date }
     // State to track if the list is expanded
     var isExpanded by remember { mutableStateOf(false) }
 
     LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
         item {
             // Show only the first reservation by default
-            if (reservations.isNotEmpty()) {
+            if (sortedReservations.isNotEmpty()) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -364,15 +366,15 @@ fun ReservationList(reservations: List<Reservation>) {
                     shape = MaterialTheme.shapes.medium
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Date: ${reservations[0].date}")
-                        Text("Time: ${reservations[0].time}")
-                        Text("Number of People: ${reservations[0].numberOfPeople}")
+                        Text("Date: ${sortedReservations[0].date}")
+                        Text("Time: ${sortedReservations[0].time}")
+                        Text("Number of People: ${sortedReservations[0].numberOfPeople}")
                     }
                 }
             }
 
             // Show the Expand button if the list has more than one item
-            if (reservations.size > 1) {
+            if (sortedReservations.size > 1) {
                 Button(
                     onClick = { isExpanded = !isExpanded },
                     colors = buttonColors(Color(0xFF762525)),
@@ -383,7 +385,7 @@ fun ReservationList(reservations: List<Reservation>) {
 
                 // Show the remaining reservations if expanded
                 if (isExpanded) {
-                    reservations.drop(1).forEach { reservation ->
+                    sortedReservations.drop(1).forEach { reservation ->
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -405,11 +407,13 @@ fun ReservationList(reservations: List<Reservation>) {
 
 @Composable
 fun ComplaintList(complaints: List<Complaint>) {
+    // Sort the complaints by timestamp
+    val sortedComplaints = complaints.sortedByDescending { it.timestamp }
     var isExpanded by remember { mutableStateOf(false) }
 
     LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
         item {
-            if (complaints.isNotEmpty()) {
+            if (sortedComplaints.isNotEmpty()) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -417,14 +421,14 @@ fun ComplaintList(complaints: List<Complaint>) {
                     shape = MaterialTheme.shapes.medium
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(formatTimestamp(complaints[0].timestamp))
-                        Text("Category: ${complaints[0].category}")
-                        Text("Complaint: ${complaints[0].complaint}")
+                        Text(formatTimestamp(sortedComplaints[0].timestamp))
+                        Text("Category: ${sortedComplaints[0].category}")
+                        Text("Complaint: ${sortedComplaints[0].complaint}")
                     }
                 }
             }
 
-            if (complaints.size > 1) {
+            if (sortedComplaints.size > 1) {
                 Button(
                     onClick = { isExpanded = !isExpanded },
                     colors = buttonColors(Color(0xFF762525)),
@@ -434,7 +438,7 @@ fun ComplaintList(complaints: List<Complaint>) {
                 }
 
                 if (isExpanded) {
-                    complaints.drop(1).forEach { complaint ->
+                    sortedComplaints.drop(1).forEach { complaint ->
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
