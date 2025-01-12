@@ -47,9 +47,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.lesxi.data.fetchUser
 import com.example.lesxi.data.model.MenuItem
 import com.example.lesxi.data.model.ReservationDetails
 import com.example.lesxi.data.model.Routes
+import com.example.lesxi.data.model.User
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import com.google.gson.Gson
@@ -70,7 +73,23 @@ fun isToday(dateString: String): Boolean {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReserveTableScreen(navController: NavController) {
+fun ReserveTableScreen(navController: NavController, firebaseUser: FirebaseUser) {
+
+    var am by remember { mutableStateOf<String?>(null) }
+    var user by remember { mutableStateOf<User?>(null) }
+    LaunchedEffect(firebaseUser.uid) {
+        fetchUser(firebaseUser.uid) { fetchedUser ->
+            user = fetchedUser
+            am = user?.am
+        }
+    }
+
+    if (am == null) {
+        Text("AM not found",
+            modifier = Modifier.fillMaxSize(),
+            textAlign = TextAlign.Center)
+        return
+    }
     var selectedDate by remember { mutableStateOf("Choose Date") }
     var selectedTime by remember { mutableStateOf("Choose Time") }
     var numberOfPeople by remember { mutableStateOf("") }
