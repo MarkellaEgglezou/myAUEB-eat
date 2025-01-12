@@ -94,11 +94,10 @@ fun Form(firebaseUser: FirebaseUser) {
     }
 
     val complaintCategories = listOf(
-        "Ποιότητα φαγητού",
-        "Εμπειρία στη λέσχη",
-        "Ταχύτητα εξυπηρέτησης",
-        "Διαδικαστικά προβλήματα",
-        "Άλλο"
+        "Food Quality",
+        "Service Issues",
+        "Hygiene Concerns",
+        "Other"
     )
     val selectedCategory = remember { mutableStateOf("") }
     val isDropdownExpanded = remember { mutableStateOf(false) }
@@ -148,7 +147,7 @@ fun Form(firebaseUser: FirebaseUser) {
                         value = selectedCategory.value,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Επιλέξτε κατηγορία") },
+                        label = { Text("Choose a category") },
                         modifier = Modifier
                             .padding(bottom = 16.dp)
                             .fillMaxWidth()
@@ -173,7 +172,7 @@ fun Form(firebaseUser: FirebaseUser) {
                 }
                 if (selectedCategoryError.value) {
                     Text(
-                        text = "Παρακαλώ επιλέξτε κατηγορία",
+                        text = "Please choose a complaint category",
                         color = Color.Red,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -199,7 +198,7 @@ fun Form(firebaseUser: FirebaseUser) {
                 )
                 if (complaintError.value) {
                     Text(
-                        text = "Παρακαλώ συμπληρώστε το παράπονό σας",
+                        text = "Please fill in your complaint",
                         color = Color.Red,
                         style = MaterialTheme.typography.bodySmall
                     )
