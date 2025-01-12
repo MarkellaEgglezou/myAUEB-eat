@@ -161,7 +161,7 @@ fun saveReservationToFirebase(
         "items" to items
     )
 
-    // Save data to Firestore
+    // Save data to FireBase
     db.collection("Reservation")
         .add(reservationData)
         .addOnSuccessListener {
