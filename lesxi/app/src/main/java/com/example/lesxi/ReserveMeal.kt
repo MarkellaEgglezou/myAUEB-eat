@@ -1,6 +1,7 @@
 package com.example.lesxi
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,6 +49,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import com.example.lesxi.data.model.*
 import com.google.gson.Gson
+import androidx.compose.ui.platform.LocalContext
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,6 +60,7 @@ fun ShowMenuItems(
     reservationDetails: ReservationDetails
 ) {
     val scrollBehavior = null
+    val context = LocalContext.current
 
     val dayMap = mapOf(
         "MONDAY" to "Mon",
@@ -85,7 +89,7 @@ fun ShowMenuItems(
     Scaffold(
         topBar = {
 
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 modifier = Modifier.fillMaxWidth(),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
@@ -94,7 +98,7 @@ fun ShowMenuItems(
                             contentDescription = stringResource(R.string.go_back),
                             tint = Color.White)
                     }
-                                 },
+                },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
                     containerColor = Color(0xFF762525),
                     titleContentColor = Color.White),
@@ -104,6 +108,7 @@ fun ShowMenuItems(
                         text = stringResource(R.string.add_reservation),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
+                            .padding(end = 30.dp)
                     )
                 }
             )
@@ -132,46 +137,76 @@ fun ShowMenuItems(
                 Spacer(modifier = Modifier.height(20.dp))
             }
 
-
             Button(
                 onClick = {
-                    if (itemsForDay?.size == itemCheckedStates.size) {
-                        // Filter checked items
-                        val checkedItems = itemsForDay.filterIndexed { index, item ->
-                            itemCheckedStates[index].value // Filter based on checked state
-                        }
+                    if (itemsForDay?.isNotEmpty() == true) {
+                        // Check if at least one item is selected
+                        val anyItemSelected = itemCheckedStates.any { it.value }
 
-                        val reserveItems = mutableListOf<String>()
-                        if (checkedItems.isNotEmpty()) {
-                            checkedItems.forEach { item ->
-                                reserveItems.add(item.title)  // Add the title to reserveItems
+                        if (anyItemSelected) {
+                            val checkedItems = itemsForDay.filterIndexed { index, _ ->
+                                itemCheckedStates[index].value
                             }
+
+                            val reserveItems = checkedItems.map { it.title }
+
+                            val reservationJson = Uri.encode(Gson().toJson(reservationDetails))
+                            val itemsJson = Uri.encode(Gson().toJson(reserveItems))
+
+                            navController.navigate(
+                                Routes.finishReservation + "/$reservationJson/$itemsJson"
+                            )
                         } else {
-                            println("checkedItems is empty or null")
+                            // Show a toast if no item is selected
+                            Toast.makeText(context, "Pick at least one item of food.", Toast.LENGTH_SHORT).show()
                         }
-
-                        // Serialize data into JSON
-                        val reservationJson = Gson().toJson(reservationDetails)
-                        val itemsJson = Gson().toJson(reserveItems)
-
-                        // Encode the JSON strings
-                        val encodedReservationJson = Uri.encode(reservationJson)
-                        val encodedItemsJson = Uri.encode(itemsJson)
-
-                        // Navigate with the encoded data
-                        navController.navigate(Routes.finishReservation + "/$encodedReservationJson/$encodedItemsJson")
                     } else {
-                        println("Error: Mismatched sizes between itemsForDay and itemCheckedStates")
+                        // Show a toast if no food items are available
+                        Toast.makeText(context, "No food items available for this day.", Toast.LENGTH_SHORT).show()
                     }
-                },
+                    },/*
+                        if (itemsForDay?.size == itemCheckedStates.size) {
+                        // Filter checked items
+                            val checkedItems = itemsForDay.filterIndexed { index, item ->
+                                itemCheckedStates[index].value // Filter based on checked state
+                            }
+
+                            val reserveItems = mutableListOf<String>()
+                            if (checkedItems.isNotEmpty()) {
+                                checkedItems.forEach { item ->
+                                    reserveItems.add(item.title)  // Add the title to reserveItems
+                                }
+                            } else {
+                                println("checkedItems is empty or null")
+                            }
+
+                            // Serialize data into JSON
+                            val reservationJson = Gson().toJson(reservationDetails)
+                            val itemsJson = Gson().toJson(reserveItems)
+
+                            // Encode the JSON strings
+                            val encodedReservationJson = Uri.encode(reservationJson)
+                            val encodedItemsJson = Uri.encode(itemsJson)
+
+                            // Navigate with the encoded data
+                            navController.navigate(Routes.finishReservation + "/$encodedReservationJson/$encodedItemsJson")
+                        } else {
+                            println("Error: Mismatched sizes between itemsForDay and itemCheckedStates")
+                        }
+                    } else {
+
+                        Toast.makeText(context, "Pick at least one item of food.", Toast.LENGTH_SHORT).show()
+                    }
+
+                },*/
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                 colors = buttonColors(Color(0xFF762525))
             ) {
                 Text("Next", color= Color.White)
             }
         }
-        }
     }
+}
 
 
 
