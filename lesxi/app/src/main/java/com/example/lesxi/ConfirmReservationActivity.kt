@@ -2,7 +2,6 @@ package com.example.lesxi
 
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -34,7 +33,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 fun ConfirmationScreen(
     navController: NavHostController,
     reservationDetails: ReservationDetails,
-    items: List<String>,
+    items: List<String>
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
@@ -155,6 +154,7 @@ fun saveReservationToFirebase(
 
     // Prepare data to save
     val reservationData = hashMapOf(
+        "am" to reservationDetails.am,
         "date" to reservationDetails.date,
         "time" to reservationDetails.time.substring(19, 27),
         "numberOfPeople" to reservationDetails.numberOfPeople,
