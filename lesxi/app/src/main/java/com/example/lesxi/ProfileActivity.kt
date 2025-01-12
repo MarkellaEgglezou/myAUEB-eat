@@ -495,6 +495,13 @@ fun EditUserDialog(uid: String, user: User, onDismiss: () -> Unit) {
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxWidth()
                 ) {
+                    Button(colors = buttonColors(Color(0xFF762525)),
+                        onClick = onDismiss) {
+                        Text("Cancel")
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
                     Button(
                         colors = buttonColors(Color(0xFF762525)),
                         onClick = {
@@ -504,11 +511,6 @@ fun EditUserDialog(uid: String, user: User, onDismiss: () -> Unit) {
                             onDismiss()
                     }) {
                         Text("Save")
-                    }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Button(colors = buttonColors(Color(0xFF762525)),
-                        onClick = onDismiss) {
-                        Text("Cancel")
                     }
                 }
             }
@@ -572,6 +574,15 @@ fun AvatarSelectionDialog(
                 ) {
                     Button(
                         colors = buttonColors(Color(0xFF762525)),
+                        onClick = onDismiss
+                    ) {
+                        Text("Cancel")
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Button(
+                        colors = buttonColors(Color(0xFF762525)),
                         onClick = {
                             // Only proceed if an avatar is selected
                             if (selectedAvatar != null) {
@@ -581,15 +592,6 @@ fun AvatarSelectionDialog(
                         }
                     ) {
                         Text("Save")
-                    }
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Button(
-                        colors = buttonColors(Color(0xFF762525)),
-                        onClick = onDismiss
-                    ) {
-                        Text("Cancel")
                     }
                 }
             }
