@@ -32,6 +32,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,9 +47,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.lesxi.data.model.MenuItem
 import com.example.lesxi.data.model.ReservationDetails
 import com.example.lesxi.data.model.Routes
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 import com.google.gson.Gson
+import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -69,6 +74,7 @@ fun ReserveTableScreen(navController: NavController) {
     var selectedDate by remember { mutableStateOf("Choose Date") }
     var selectedTime by remember { mutableStateOf("Choose Time") }
     var numberOfPeople by remember { mutableStateOf("") }
+    var unavailableSlots by remember { mutableStateOf<List<String>>(emptyList()) }
 
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -136,6 +142,7 @@ fun ReserveTableScreen(navController: NavController) {
                 Text(selectedDate)
             }
 
+
             val timeSlots = if (selectedDate != "Choose Date") {
                 listOf(
                     "08:00 AM", "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM", "03:00 PM", "07:00 PM", "07:30 PM", "08:00 PM"
@@ -144,7 +151,37 @@ fun ReserveTableScreen(navController: NavController) {
                 listOf()
             }
 
-            val unavailableSlots = setOf("01:00 PM")
+
+            suspend fun fetchUnavailableSlots(date: String): List<String> {
+                val db = FirebaseFirestore.getInstance()
+                val timeSlotss = mutableListOf<String>()
+
+                try {
+                val result = db.collection("TimeSlots")
+                    .whereEqualTo("date", date)
+                    .whereEqualTo("free", 0)
+                    .get()
+                    .await()
+
+
+                    for (document in result) {
+                        val timeSlott = document.getString("time")
+                        timeSlott?.let { timeSlotss.add(it) }
+                    }
+                } catch (exception: Exception) {
+                    println("Error getting documents: $exception")
+                }
+
+                return timeSlotss
+            }
+
+            LaunchedEffect(selectedDate) {
+                if (selectedDate != "Choose Date") {
+                    // Call the suspend function to fetch unavailable slots
+                    unavailableSlots = fetchUnavailableSlots(selectedDate)
+                }
+            }
+
 
             val currentTime = LocalTime.now()
             val formatter = DateTimeFormatter.ofPattern("hh:mm a")
@@ -162,6 +199,7 @@ fun ReserveTableScreen(navController: NavController) {
                     !unavailableSlots.contains(timeSlot)
                 }
             }
+
 
 
             // Remember selected time state
@@ -301,7 +339,7 @@ fun ReserveTableScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.weight(1f))
             Button(
-                onClick = {if (selectedDate != "Choose Date" && selectedTime.value.isNotEmpty()) {
+                onClick = {if (selectedDate != "Choose Date" && selectedTime.value.isNotEmpty() && (isDisabled || selectedText != "Select number of people for dining in")) {
                     val numberOfPeople = if (isDisabled) "0" else selectedText
                     val reservationDetails = ReservationDetails(
                         date = selectedDate, time = selectedTime.toString(),
