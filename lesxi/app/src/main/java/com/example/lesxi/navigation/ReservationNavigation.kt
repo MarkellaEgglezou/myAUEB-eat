@@ -13,6 +13,7 @@ import com.example.lesxi.ShowMenuItems
 import com.example.lesxi.data.model.ReservationDetails
 import com.example.lesxi.data.model.Routes
 import com.google.common.reflect.TypeToken
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 
 
@@ -20,9 +21,14 @@ import com.google.gson.Gson
 @Composable
 fun ReserveNavigation() {
     val navController = rememberNavController()
+    val currentUser = FirebaseAuth.getInstance().currentUser
 
     NavHost(navController = navController, startDestination = Routes.reserveDetails) {
-        composable(Routes.reserveDetails) { ReserveTableScreen(navController) }
+        composable(Routes.reserveDetails) {
+            if (currentUser != null) {
+                ReserveTableScreen(navController, currentUser)
+            }
+        }
         composable(
             route = Routes.showMeals+"/{day}/{reservationDetails}",
             arguments = listOf(
