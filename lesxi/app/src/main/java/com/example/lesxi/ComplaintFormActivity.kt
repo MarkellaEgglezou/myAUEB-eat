@@ -111,7 +111,7 @@ fun Form(firebaseUser: FirebaseUser) {
                 ),
                 title = {
                     Text(
-                        "Menu",
+                        "Complaint Form",
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
                     )
