@@ -2,10 +2,7 @@ package com.example.lesxi
 
 import android.app.DatePickerDialog
 import android.net.Uri
-import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,13 +45,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.lesxi.data.fetchUser
-import com.example.lesxi.data.model.MenuItem
 import com.example.lesxi.data.model.ReservationDetails
 import com.example.lesxi.data.model.Routes
 import com.example.lesxi.data.model.User
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.toObject
 import com.google.gson.Gson
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
@@ -361,6 +356,7 @@ fun ReserveTableScreen(navController: NavController, firebaseUser: FirebaseUser)
                 onClick = {if (selectedDate != "Choose Date" && selectedTime.value.isNotEmpty() && (isDisabled || selectedText != "Select number of people for dining in")) {
                     val numberOfPeople = if (isDisabled) "0" else selectedText
                     val reservationDetails = ReservationDetails(
+                        am = am!!,
                         date = selectedDate, time = selectedTime.toString(),
                         numberOfPeople = numberOfPeople,
                     )
