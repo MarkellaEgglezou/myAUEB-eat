@@ -5,6 +5,7 @@ import com.example.lesxi.data.model.Reservation
 import com.example.lesxi.data.model.User
 import com.google.firebase.firestore.FirebaseFirestore
 
+// Get user object using user id
 fun fetchUser(uid: String, onComplete: (User?) -> Unit) {
     val db = FirebaseFirestore.getInstance()
 
@@ -21,10 +22,9 @@ fun fetchUser(uid: String, onComplete: (User?) -> Unit) {
         }
 }
 
+// Get list of reservations and complaints based on user am
 fun fetchAllData(am: String, onComplete: (List<Reservation>, List<Complaint>) -> Unit) {
     val db = FirebaseFirestore.getInstance()
-
-    // Initialize the results
     var reservations: List<Reservation> = listOf()
     var complaints: List<Complaint> = listOf()
 
@@ -66,6 +66,7 @@ fun fetchAllData(am: String, onComplete: (List<Reservation>, List<Complaint>) ->
         }
 }
 
+// Update user name and surname
 fun updateUser(uid: String, user: User) {
     val db = FirebaseFirestore.getInstance()
     val userCollection = db.collection("User")
@@ -85,6 +86,7 @@ fun updateUser(uid: String, user: User) {
         }
 }
 
+// Update user profile picture
 fun updateUserProfilePicture(uid: String, user: User) {
     val db = FirebaseFirestore.getInstance()
     val userCollection = db.collection("User")

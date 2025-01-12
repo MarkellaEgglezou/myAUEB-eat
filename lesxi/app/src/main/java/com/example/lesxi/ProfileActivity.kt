@@ -73,7 +73,6 @@ class ProfileActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             LesxiTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -95,6 +94,7 @@ class ProfileActivity : ComponentActivity() {
     }
 }
 
+// Get all data and call UserProfile
 @Composable
 fun ProfileScreen(firebaseUser: FirebaseUser) {
     var am by remember { mutableStateOf<String?>(null) }
@@ -102,7 +102,6 @@ fun ProfileScreen(firebaseUser: FirebaseUser) {
     var reservations by remember { mutableStateOf(listOf<Reservation>()) }
     var complaints by remember { mutableStateOf(listOf<Complaint>()) }
 
-    // Fetch all data
     if (am == null) {
         LaunchedEffect(firebaseUser.uid) {
             fetchUser(firebaseUser.uid) { fetchedUser ->
@@ -130,6 +129,7 @@ fun ProfileScreen(firebaseUser: FirebaseUser) {
     }
 }
 
+// User profile page
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfile(
@@ -199,6 +199,7 @@ fun UserProfile(
     )
 }
 
+// Show user profile picture and modify it
 @Composable
 fun ProfilePicture(
     user: User,
@@ -206,7 +207,7 @@ fun ProfilePicture(
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
-    // Avatar selection dialog triggered by clicking the profile picture
+    // Trigger avatar selection dialog by clicking the profile picture
     if (showDialog) {
         AvatarSelectionDialog(
             onAvatarSelected = { avatarName ->
@@ -219,7 +220,6 @@ fun ProfilePicture(
 
     // Determine which image to show based on user.avatar_photo
     val painter = if (user.avatarPhoto.isNotEmpty()) {
-        // Dynamically load the avatar image based on the avatar name
         val avatarResId = when (user.avatarPhoto) {
             "bear" -> R.drawable.bear
             "cat" -> R.drawable.cat
@@ -230,11 +230,11 @@ fun ProfilePicture(
             "polar_bear" -> R.drawable.polar_bear
             "puffer_fish" -> R.drawable.puffer_fish
             "sea_lion" -> R.drawable.sea_lion
-            else -> R.drawable.ic_launcher_foreground // Default image in case of an unexpected value
+            else -> R.drawable.ic_launcher_foreground // Default image in case of unexpected value
         }
         painterResource(id = avatarResId)
     } else {
-        painterResource(id = R.drawable.ic_launcher_foreground) // Fallback image
+        painterResource(id = R.drawable.ic_launcher_foreground) // Default image if empty
     }
 
     Surface(
@@ -242,7 +242,7 @@ fun ProfilePicture(
         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
         modifier = Modifier
             .size(80.dp)
-            .clickable { showDialog = true } // Open the dialog when clicked
+            .clickable { showDialog = true }
     ) {
         Image(
             painter = painter,
@@ -253,18 +253,18 @@ fun ProfilePicture(
     }
 }
 
+// Show user information, edit and logout icons
 @Composable
 fun UserInfo(uid: String, user: User) {
     val context = LocalContext.current
     var showEditDialog by remember { mutableStateOf(false) }
-    var newUser by remember { mutableStateOf(User()) } // Assuming a User class exists
+    var newUser by remember { mutableStateOf(User()) }
     var selectedAvatar by remember { mutableStateOf<String?>(null) }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
     ) {
-        // Profile Picture
         ProfilePicture(
             user,
             onAvatarSelected = { avatarName ->
@@ -276,7 +276,6 @@ fun UserInfo(uid: String, user: User) {
 
         Spacer(modifier = Modifier.width(16.dp))
 
-        // User's Name and AM
         Column(
             modifier = Modifier.weight(1f)
         ) {
@@ -285,12 +284,11 @@ fun UserInfo(uid: String, user: User) {
             Text(user.email, style = MaterialTheme.typography.bodySmall)
         }
 
-        // Column to stack the icons vertically
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Edit Icon
+            // Edit icon
             Icon(
                 imageVector = Icons.Default.Edit,
                 contentDescription = "Edit Profile",
@@ -301,9 +299,9 @@ fun UserInfo(uid: String, user: User) {
                     }
             )
 
-            Spacer(modifier = Modifier.height(8.dp))  // Space between icons
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // Logout Icon
+            // Logout icon
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                 contentDescription = "Logout",
@@ -328,6 +326,7 @@ fun UserInfo(uid: String, user: User) {
     }
 }
 
+// Show section titles
 @Composable
 fun SectionTitle(title: String) {
     Text(
@@ -337,17 +336,15 @@ fun SectionTitle(title: String) {
     )
 }
 
+// Format timestamp to be user-friendly
 fun formatTimestamp(timestamp: Timestamp?): String {
     if (timestamp == null) return "No date available"
-
-    // Convert Timestamp to Date
     val date = timestamp.toDate()
-
-    // Format the Date into a user-friendly string
     val formatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
     return formatter.format(date)
 }
 
+// Show user reservation list
 @Composable
 fun ReservationList(reservations: List<Reservation>) {
     // Sort the reservations by date
@@ -405,14 +402,17 @@ fun ReservationList(reservations: List<Reservation>) {
     }
 }
 
+// Show user complaint list
 @Composable
 fun ComplaintList(complaints: List<Complaint>) {
     // Sort the complaints by timestamp
     val sortedComplaints = complaints.sortedByDescending { it.timestamp }
+    // State to track if the list is expanded
     var isExpanded by remember { mutableStateOf(false) }
 
     LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
         item {
+            // Show only the first complaint by default
             if (sortedComplaints.isNotEmpty()) {
                 Card(
                     modifier = Modifier
@@ -428,6 +428,7 @@ fun ComplaintList(complaints: List<Complaint>) {
                 }
             }
 
+            // Show the Expand button if the list has more than one item
             if (sortedComplaints.size > 1) {
                 Button(
                     onClick = { isExpanded = !isExpanded },
@@ -437,6 +438,7 @@ fun ComplaintList(complaints: List<Complaint>) {
                     Text(if (isExpanded) "Show Less" else "Show More")
                 }
 
+                // Show the remaining complaints if expanded
                 if (isExpanded) {
                     sortedComplaints.drop(1).forEach { complaint ->
                         Card(
@@ -458,6 +460,7 @@ fun ComplaintList(complaints: List<Complaint>) {
     }
 }
 
+// Edit user name and surname dialog
 @Composable
 fun EditUserDialog(uid: String, user: User, onDismiss: () -> Unit) {
     var name by remember { mutableStateOf(user.name) }
@@ -477,7 +480,6 @@ fun EditUserDialog(uid: String, user: User, onDismiss: () -> Unit) {
             ) {
                 Text(text = "Edit Profile", style = MaterialTheme.typography.titleMedium)
 
-                // Input fields for name, surname, and email
                 androidx.compose.material3.OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
@@ -514,6 +516,7 @@ fun EditUserDialog(uid: String, user: User, onDismiss: () -> Unit) {
     }
 }
 
+// Edit user avatar dialog
 @Composable
 fun AvatarSelectionDialog(
     onAvatarSelected: (String) -> Unit,
@@ -532,7 +535,6 @@ fun AvatarSelectionDialog(
         "sea_lion"
     )
 
-    // Change selectedAvatar to store the name of the avatar
     var selectedAvatar by remember { mutableStateOf<String?>(null) }
 
     androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
@@ -559,7 +561,6 @@ fun AvatarSelectionDialog(
                             isSelected = avatar == selectedAvatar,
                             onClick = {
                                 selectedAvatar = avatar
-                                // Don't dismiss the dialog here
                             }
                         )
                     }
@@ -574,9 +575,9 @@ fun AvatarSelectionDialog(
                         onClick = {
                             // Only proceed if an avatar is selected
                             if (selectedAvatar != null) {
-                                onAvatarSelected(selectedAvatar!!) // Pass the selected avatar name
+                                onAvatarSelected(selectedAvatar!!)
                             }
-                            onDismiss() // Close the dialog when Save is clicked
+                            onDismiss()
                         }
                     ) {
                         Text("Save")
@@ -586,7 +587,7 @@ fun AvatarSelectionDialog(
 
                     Button(
                         colors = buttonColors(Color(0xFF762525)),
-                        onClick = onDismiss // Just dismiss when Cancel is clicked
+                        onClick = onDismiss
                     ) {
                         Text("Cancel")
                     }
@@ -596,6 +597,7 @@ fun AvatarSelectionDialog(
     }
 }
 
+// Show available avatars
 @Composable
 fun AvatarItem(avatar: String, isSelected: Boolean, onClick: () -> Unit) {
     Card(
@@ -604,9 +606,8 @@ fun AvatarItem(avatar: String, isSelected: Boolean, onClick: () -> Unit) {
         modifier = Modifier
             .padding(8.dp)
             .size(80.dp)
-            .clickable { onClick() } // Clicking on an avatar will update the selection, but not dismiss the dialog
+            .clickable { onClick() }
     ) {
-        // Assuming the images are named the same as the avatar strings (e.g., "bear", "cat", etc.)
         val imageId = when (avatar) {
             "bear" -> R.drawable.bear
             "cat" -> R.drawable.cat
@@ -617,7 +618,7 @@ fun AvatarItem(avatar: String, isSelected: Boolean, onClick: () -> Unit) {
             "polar_bear" -> R.drawable.polar_bear
             "puffer_fish" -> R.drawable.puffer_fish
             "sea_lion" -> R.drawable.sea_lion
-            else -> R.drawable.bear // Default avatar in case of an error
+            else -> R.drawable.bear
         }
 
         Image(

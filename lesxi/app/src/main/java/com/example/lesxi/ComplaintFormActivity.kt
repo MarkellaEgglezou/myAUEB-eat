@@ -1,8 +1,6 @@
 package com.example.lesxi
 
-import android.content.Context
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -40,20 +38,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.lesxi.ui.theme.LesxiTheme
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.FirebaseFirestore
 import com.example.lesxi.data.model.*
 import com.example.lesxi.data.*
-import com.example.lesxi.navigation.*
 
 class ComplaintFormActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             LesxiTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -74,6 +68,7 @@ class ComplaintFormActivity : ComponentActivity() {
     }
 }
 
+// Show complaint form
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Form(firebaseUser: FirebaseUser) {
@@ -132,6 +127,8 @@ fun Form(firebaseUser: FirebaseUser) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+
+                // Complaint category dropdown menu
                 Text(
                     text = stringResource(R.string.complaint_category),
                     style = androidx.compose.material.MaterialTheme.typography.h6,
@@ -178,6 +175,7 @@ fun Form(firebaseUser: FirebaseUser) {
                     )
                 }
 
+                // Complaint text box
                 Text(
                     text = stringResource(R.string.complaint),
                     style = androidx.compose.material.MaterialTheme.typography.h6,
@@ -205,6 +203,8 @@ fun Form(firebaseUser: FirebaseUser) {
                 }
 
                 Spacer(modifier = Modifier.height(40.dp))
+
+                // Submit button
                 val context = LocalContext.current
                 SubmitButton (
                     onSubmit = {
@@ -228,6 +228,7 @@ fun Form(firebaseUser: FirebaseUser) {
     )
 }
 
+// Text field functionality
 @Composable
 fun EditTextField(value: String, onValueChange: (String) -> Unit, isError: Boolean,
                   modifier: Modifier = Modifier) {
@@ -239,6 +240,7 @@ fun EditTextField(value: String, onValueChange: (String) -> Unit, isError: Boole
     )
 }
 
+// Submit button functionality
 @Composable
 fun SubmitButton(
     onSubmit: () -> Unit,
@@ -257,26 +259,4 @@ fun SubmitButton(
     ) {
         Text("Submit")
     }
-}
-
-fun submitComplaintToFirebase(am: String, category: String, complaint: String,  context: Context) {
-    val db = FirebaseFirestore.getInstance()
-
-    val complaintRecord = Complaint(
-        am = am,
-        category = category,
-        complaint = complaint,
-        timestamp = Timestamp.now()
-    )
-
-    db.collection("Complaint")
-        .add(complaintRecord)
-        .addOnSuccessListener {
-            Toast.makeText(context, "Complaint submitted successfully",
-                Toast.LENGTH_SHORT).show()
-        }
-        .addOnFailureListener {
-            Toast.makeText(context, "Error submitting complaint: ${it.message}",
-                Toast.LENGTH_SHORT).show()
-        }
 }
