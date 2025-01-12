@@ -55,6 +55,7 @@ fun ConfirmationScreen(
                             text = stringResource(R.string.add_reservation),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
+                                .padding(end = 30.dp)
                         )
                     }
                 )
@@ -67,7 +68,7 @@ fun ConfirmationScreen(
             Spacer(modifier = Modifier.height(60.dp))
             Text("Reservation Details:")
             Text("Date: ${reservationDetails.date}")
-            Text("Time: ${reservationDetails.time}")
+            Text("Time: ${reservationDetails.time.substring(19, 27)}")
             Text("Number of People: ${reservationDetails.numberOfPeople}")
 
             Spacer(modifier = Modifier.height(16.dp))
