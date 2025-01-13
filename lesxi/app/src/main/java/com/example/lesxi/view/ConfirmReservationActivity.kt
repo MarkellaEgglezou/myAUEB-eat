@@ -1,4 +1,4 @@
-package com.example.lesxi
+package com.example.lesxi.view
 
 
 import android.content.Context
@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.lesxi.R
 import com.example.lesxi.data.model.ReservationDetails
 import com.example.lesxi.data.model.Routes
 import com.google.firebase.firestore.FirebaseFirestore

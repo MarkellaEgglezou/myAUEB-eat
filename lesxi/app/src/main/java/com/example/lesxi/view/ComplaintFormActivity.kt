@@ -1,4 +1,4 @@
-package com.example.lesxi
+package com.example.lesxi.view
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -37,6 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.lesxi.R
 import com.example.lesxi.ui.theme.LesxiTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser

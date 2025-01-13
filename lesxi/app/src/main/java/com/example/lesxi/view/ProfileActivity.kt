@@ -1,4 +1,4 @@
-package com.example.lesxi
+package com.example.lesxi.view
 
 import android.app.Activity
 import android.content.Intent
@@ -53,6 +53,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.lesxi.R
 import com.example.lesxi.data.fetchAllData
 import com.example.lesxi.data.fetchUser
 import com.example.lesxi.data.model.Complaint
@@ -61,7 +62,6 @@ import com.example.lesxi.data.model.User
 import com.example.lesxi.data.updateUser
 import com.example.lesxi.data.updateUserProfilePicture
 import com.example.lesxi.ui.theme.LesxiTheme
-import com.example.lesxi.view.MainActivity
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser

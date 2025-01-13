@@ -21,9 +21,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.lesxi.Form
+import com.example.lesxi.view.Form
 import com.example.lesxi.view.user.LoginRegisterScreen
-import com.example.lesxi.ProfileScreen
+import com.example.lesxi.view.ProfileScreen
 import com.example.lesxi.data.model.Routes
 import com.google.firebase.auth.FirebaseAuth
 
