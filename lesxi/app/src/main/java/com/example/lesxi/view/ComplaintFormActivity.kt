@@ -128,6 +128,7 @@ fun Form(firebaseUser: FirebaseUser) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                Spacer(modifier = Modifier.height(40.dp))
 
                 // Complaint category dropdown menu
                 Text(
