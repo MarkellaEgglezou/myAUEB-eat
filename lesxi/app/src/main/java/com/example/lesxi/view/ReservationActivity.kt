@@ -2,6 +2,7 @@ package com.example.lesxi.view
 
 import android.app.DatePickerDialog
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -89,6 +90,7 @@ fun ReserveTableScreen(navController: NavController, firebaseUser: FirebaseUser)
     var selectedTime by remember { mutableStateOf("Choose Time") }
     var numberOfPeople by remember { mutableStateOf("") }
     var unavailableSlots by remember { mutableStateOf<List<String>>(emptyList()) }
+    var availableSpots by remember { mutableStateOf(100) }
 
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -291,7 +293,35 @@ fun ReserveTableScreen(navController: NavController, firebaseUser: FirebaseUser)
                     onCheckedChange = { isDisabled = it })
             }
                 val context = LocalContext.current
-                val noofpeople = arrayOf(
+
+                suspend fun fetchAvailableSpots(date: String, time: String): Int {
+                    val db = FirebaseFirestore.getInstance()
+                    val snapshot = db.collection("TimeSlots")
+                        .whereEqualTo("date", date)
+                        .whereEqualTo("time", time)
+                        .get()
+                        .await()
+                    Log.d("check", "check: $date")
+                    Log.d("check", "check: $time")
+
+                    var spots = 100
+                    if (!snapshot.isEmpty) {
+                        val document = snapshot.documents.first()
+                        spots = document.getLong("free")?.toInt() ?: 100
+                        Log.d("checkfirst", "check: $spots")
+                        return spots
+                    }
+                    Log.d("check", "check: $spots")
+                    return spots
+                }
+
+            LaunchedEffect(selectedDate, currentSelectedTime) {
+                if (selectedDate != "Choose Date" && currentSelectedTime != "Choose Time") {
+                    availableSpots = fetchAvailableSpots(selectedDate, currentSelectedTime)
+                }
+            }
+
+            val noofpeople = arrayOf(
                     "Select number of people for dining in",
                     "1",
                     "2",
@@ -304,6 +334,10 @@ fun ReserveTableScreen(navController: NavController, firebaseUser: FirebaseUser)
                     "9",
                     "10"
                 )
+
+                val validOptions = noofpeople.filter { it.toIntOrNull() ?: 0 <= availableSpots /*&& it != "Select number of people for dining in"*/ }
+                Log.d("Filtering", "Filtered Options: $validOptions")
+
                 var expanded by remember { mutableStateOf(false) }
                 var selectedText by remember { mutableStateOf(noofpeople[0]) }
 
@@ -337,7 +371,7 @@ fun ReserveTableScreen(navController: NavController, firebaseUser: FirebaseUser)
                             expanded = expanded,
                             onDismissRequest = { expanded = false }
                         ) {
-                            noofpeople.forEach { item ->
+                            validOptions.forEach { item ->
                                 DropdownMenuItem(
                                     text = { Text(text = item) },
                                     onClick = {
