@@ -63,15 +63,24 @@ fun BottomNavigationBar(navController: NavController) {
 }
 
 @Composable
-fun NavigationGraph(navController: NavHostController, modifier: Modifier) {
+fun NavigationGraph(navController: NavHostController, modifier: Modifier, onLoginStatusChanged: (Boolean) -> Unit) {
     val currentUser = FirebaseAuth.getInstance().currentUser
     NavHost(
         navController = navController,
-        startDestination = if (currentUser != null) Routes.login else Routes.main_page,
+        startDestination = if (currentUser != null) Routes.main_page else Routes.login,
         modifier = modifier
     ) {
-        composable(Routes.login) { LoginRegisterScreen(navController) }
-        composable(Routes.main_page) { MenuNavigation() }
+        composable(Routes.login) {
+            LoginRegisterScreen(navController) { success ->
+                if (success) {
+                    onLoginStatusChanged(true)
+                    navController.navigate(Routes.main_page) {
+                        popUpTo(Routes.login) { inclusive = true }
+                    }
+                }
+            }
+        }
+        composable(Routes.main_page) { MenuNavigation(navController) }
         composable(Routes.reservation_page) { ReserveNavigation() }
         composable(Routes.form) {
             FirebaseAuth.getInstance().currentUser?.let {
@@ -83,6 +92,7 @@ fun NavigationGraph(navController: NavHostController, modifier: Modifier) {
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxSize()
                     )
+                    navController.navigate(Routes.login)
                 }
             }
         }
@@ -96,6 +106,7 @@ fun NavigationGraph(navController: NavHostController, modifier: Modifier) {
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxSize()
                     )
+                    navController.navigate(Routes.login)
                 }
             }
         }

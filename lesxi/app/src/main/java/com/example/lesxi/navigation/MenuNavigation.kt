@@ -1,6 +1,8 @@
 package com.example.lesxi.navigation
 
+
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -9,7 +11,7 @@ import com.example.lesxi.view.MenuLexi
 import com.example.lesxi.data.model.Routes
 
 @Composable
-fun MenuNavigation() {
+fun MenuNavigation(navController: NavHostController) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = Routes.main_page) {

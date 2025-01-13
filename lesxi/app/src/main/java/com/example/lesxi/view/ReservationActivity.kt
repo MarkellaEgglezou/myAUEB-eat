@@ -84,7 +84,6 @@ fun ReserveTableScreen(navController: NavController, firebaseUser: FirebaseUser)
         Text("AM not found",
             modifier = Modifier.fillMaxSize(),
             textAlign = TextAlign.Center)
-        return
     }
     var selectedDate by remember { mutableStateOf("Choose Date") }
     var selectedTime by remember { mutableStateOf("Choose Time") }

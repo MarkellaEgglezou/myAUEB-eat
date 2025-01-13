@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -50,7 +51,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun LoginRegisterScreen(navController: NavHostController) {
+fun LoginRegisterScreen(navController: NavHostController, onLoginSuccess: (Boolean) -> Unit) {
     var isLoginMode by remember { mutableStateOf(true) }
     var email by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
@@ -126,7 +127,9 @@ fun LoginRegisterScreen(navController: NavHostController) {
                 color = Color(0xFF762525))
         }
         if (isLoginMode) {
-            LoginButton(email = email, password = password, navController = navController)
+            LoginButton(email = email, password = password, navController = navController,
+                onLoginSuccess = onLoginSuccess
+            )
         } else {
             RegisterButton(
                 email = email,
@@ -188,15 +191,15 @@ fun passwordTextField(fieldType: String): String {
     return password
 }
 @Composable
-fun LoginButton(modifier: Modifier = Modifier, email: String, password: String, navController: NavHostController) {
+fun LoginButton(modifier: Modifier = Modifier, email: String, password: String, navController: NavHostController, onLoginSuccess: (Boolean) -> Unit) {
     val context = LocalContext.current
     Column (
         modifier = modifier
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        androidx.compose.material3.Button(onClick = {
-            loginUser(email, password, appContext = context, navController = navController)
+        Button(onClick = {
+            loginUser(email, password, appContext = context, navController = navController, onLoginSuccess)
         }, colors = buttonColors(Color(0xFF762525)))
         {
             Text(stringResource(R.string.login))
@@ -215,7 +218,7 @@ fun RegisterButton(modifier: Modifier = Modifier, email: String, password: Strin
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        androidx.compose.material3.Button(onClick = {
+        Button(onClick = {
             if (password == confirm) {
                 registerUser(email = email, name=name, surname=surname, am=am, password = password, appContext = context)
             }
@@ -225,13 +228,15 @@ fun RegisterButton(modifier: Modifier = Modifier, email: String, password: Strin
     }
 }
 
-private fun loginUser(email: String, password: String, appContext: Context, navController: NavHostController) {
+private fun loginUser(email: String, password: String, appContext: Context, navController: NavHostController, onLoginSuccess: (Boolean) -> Unit) {
     FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
         .addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                navController.navigate(Routes.main_page)
-
                 Toast.makeText(appContext, "User Login In Successfully", Toast.LENGTH_SHORT).show()
+//                navController.navigate(Routes.main_page) {
+//                    popUpTo(Routes.login) { inclusive = true } // Clear back stack
+//                }
+                onLoginSuccess(true)
 
 
             } else {

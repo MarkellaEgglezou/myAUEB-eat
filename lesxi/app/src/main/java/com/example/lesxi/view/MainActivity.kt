@@ -6,11 +6,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.example.lesxi.view.user.LoginRegisterScreen
 import com.example.lesxi.navigation.BottomNavigationBar
 import com.example.lesxi.navigation.NavigationGraph
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class MainActivity : ComponentActivity() {
@@ -21,12 +23,22 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
-            LoginRegisterScreen(navController)
+            val isUserLoggedIn = remember { mutableStateOf(FirebaseAuth.getInstance().currentUser != null) }
 
             Scaffold(
-                bottomBar = { BottomNavigationBar(navController) }
+                bottomBar = {
+                    if (isUserLoggedIn.value) {
+                        BottomNavigationBar(navController)
+                    }
+                }
             ) { innerPadding ->
-                NavigationGraph(navController = navController, modifier = Modifier.padding(innerPadding))
+                NavigationGraph(
+                    navController = navController,
+                    modifier = Modifier.padding(innerPadding),
+                    onLoginStatusChanged = { isLoggedIn ->
+                        isUserLoggedIn.value = isLoggedIn
+                    }
+                )
             }
 
         }
