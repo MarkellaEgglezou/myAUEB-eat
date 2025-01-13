@@ -232,7 +232,7 @@ private fun loginUser(email: String, password: String, appContext: Context, navC
     FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
         .addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                Toast.makeText(appContext, "User Login In Successfully", Toast.LENGTH_SHORT).show()
+                Toast.makeText(appContext, "User Login Successful", Toast.LENGTH_SHORT).show()
 //                navController.navigate(Routes.main_page) {
 //                    popUpTo(Routes.login) { inclusive = true } // Clear back stack
 //                }
@@ -270,7 +270,7 @@ private fun registerUser(email: String, name: String, surname: String, am: Strin
                         appContext.startActivity(intent)
 
 
-                        Toast.makeText(appContext, "User Registered Successfully!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(appContext, "User Registration Successfull!", Toast.LENGTH_SHORT).show()
                     }
                     .addOnFailureListener { exception ->
                         Toast.makeText(appContext, "Error saving user data: ${exception.message}", Toast.LENGTH_SHORT).show()
