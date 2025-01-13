@@ -61,7 +61,7 @@ fun MenuLexi(navController: NavHostController) {
     val db = FirebaseFirestore.getInstance()
     var items by remember { mutableStateOf<List<MenuItem>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
-    var selectedDay by remember { mutableStateOf("Monday") }
+    var selectedDay by remember { mutableStateOf("") }
     val scrollState = rememberScrollState()
 
 
