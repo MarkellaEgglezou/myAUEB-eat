@@ -12,6 +12,7 @@ import com.example.lesxi.view.ReserveTableScreen
 import com.example.lesxi.view.ShowMenuItems
 import com.example.lesxi.data.model.ReservationDetails
 import com.example.lesxi.data.model.Routes
+import com.example.lesxi.view.MenuLexi
 import com.google.common.reflect.TypeToken
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
@@ -63,6 +64,10 @@ fun ReserveNavigation() {
                 navController, reservationDetails, itemsList
             )
             
+        }
+
+        composable(Routes.main_page) {
+            MenuLexi(navController = navController)
         }
     }
 }

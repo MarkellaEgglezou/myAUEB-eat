@@ -171,7 +171,7 @@ fun saveReservationToFirebase(
 
             Toast.makeText(context, "Reservation confirmed!", Toast.LENGTH_SHORT).show()
             //navController.popBackStack()
-            navController.navigate(Routes.menu) //it doesn't land there - app turns off
+            navController.navigate(Routes.main_page) //it doesn't land there - app turns off
         }
         .addOnFailureListener { exception ->
             // Handle error
