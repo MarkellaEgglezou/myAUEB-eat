@@ -385,6 +385,26 @@ fun ReserveTableScreen(navController: NavController, firebaseUser: FirebaseUser)
                     }
                 }
 
+            fun getMealTypeForTimeSlot(timeSlot: String): List<String> {
+                return when (timeSlot) {
+                    "08:00 AM" -> {
+                        listOf("Breakfast")
+                    }
+                    in listOf("12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM", "03:00 PM") -> {
+                        listOf("Lunch", "Appetizer", "Dessert")
+                    }
+                    in listOf("07:00 PM", "07:30 PM", "08:00 PM") -> {
+                        listOf("Dinner", "Appetizer", "Dessert")
+                    }
+                    else -> {
+                        listOf()
+                    }
+                }
+            }
+
+
+            val typeofmeal = getMealTypeForTimeSlot(selectedTime.toString().substring(19,27))
+
             Spacer(modifier = Modifier.weight(1f))
             Button(
                 onClick = {if (selectedDate != "Choose Date" && selectedTime.value.isNotEmpty() && (isDisabled || selectedText != "Select number of people for dining in")) {
@@ -393,6 +413,7 @@ fun ReserveTableScreen(navController: NavController, firebaseUser: FirebaseUser)
                         am = am!!,
                         date = selectedDate, time = selectedTime.toString(),
                         numberOfPeople = numberOfPeople,
+                        type = typeofmeal
                     )
 
                     val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
