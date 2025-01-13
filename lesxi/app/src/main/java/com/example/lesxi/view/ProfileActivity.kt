@@ -1,6 +1,7 @@
 package com.example.lesxi.view
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -309,7 +310,13 @@ fun UserInfo(uid: String, user: User) {
                     .size(24.dp)
                     .clickable {
                         Toast.makeText(context, "Logout successful", Toast.LENGTH_SHORT).show()
-                        // Restart the app
+                        FirebaseAuth.getInstance().signOut()
+
+
+                        val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                        sharedPreferences.edit().clear().apply()
+
+
                         val intent = Intent(context, MainActivity::class.java)
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
                         context.startActivity(intent)
