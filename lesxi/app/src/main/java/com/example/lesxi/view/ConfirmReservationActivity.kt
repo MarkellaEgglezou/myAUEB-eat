@@ -27,6 +27,7 @@ import com.example.lesxi.R
 import com.example.lesxi.data.model.ReservationDetails
 import com.example.lesxi.data.model.Routes
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FieldValue
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -167,11 +168,10 @@ fun saveReservationToFirebase(
         .add(reservationData)
         .addOnSuccessListener {
 
-            //updateTimeSlot(reservationDetails.date, reservationDetails.time, reservationDetails.numberOfPeople.toInt())
-
+            updateOrCreateDocument("TimeSlots", reservationDetails.date, reservationDetails.time.substring(19, 27), reservationDetails.numberOfPeople.toInt())
             Toast.makeText(context, "Reservation confirmed!", Toast.LENGTH_SHORT).show()
             //navController.popBackStack()
-            navController.navigate(Routes.main_page) //it doesn't land there - app turns off
+            navController.navigate(Routes.main_page)
         }
         .addOnFailureListener { exception ->
             // Handle error
@@ -179,49 +179,54 @@ fun saveReservationToFirebase(
         }
 }
 
-/*fun updateTimeSlot(date: String, time: String, numberOfPeople: Int) {
+fun updateOrCreateDocument(
+    collectionName: String,
+    date: String,
+    time: String,
+    free: Int
+) {
     val db = FirebaseFirestore.getInstance()
 
-    // Reference the document in TimeSlots collection for the given date and time
-    val timeSlotRef = db.collection("TimeSlots")
+    db.collection(collectionName)
         .whereEqualTo("date", date)
         .whereEqualTo("time", time)
-        .limit(1)
-
-    timeSlotRef.get().addOnSuccessListener { result ->
-        if (!result.isEmpty) {
-            // Assuming the document is found and we have the timeSlot document
-            val timeSlotDocument = result.documents[0]
-            val freeSpots = timeSlotDocument.getLong("free")?.toInt() ?: 0
-
-            Log.d("updateTimeSlot", "Found time slot: $timeSlotDocument")
-
-            if (freeSpots > 0) {
-                // Update the booked spots and available spots
-                val updatedFreeSpots = freeSpots - numberOfPeople
-
-                val updates: MutableMap<String, Any> = hashMapOf(
-                    "free" to updatedFreeSpots
+        .get()
+        .addOnSuccessListener { documents ->
+            if (!documents.isEmpty) {
+                // Update the existing document(s)
+                for (document in documents) {
+                    db.collection(collectionName)
+                        .document(document.id)
+                        .update("free", FieldValue.increment(-free.toLong()))
+                        .addOnSuccessListener {
+                            println("Field updated successfully for document ID: ${document.id}")
+                        }
+                        .addOnFailureListener { e ->
+                            println("Error updating field for document ID: ${document.id}: ${e.message}")
+                        }
+                }
+            } else {
+                // No matching document, create a new one
+                val newDocument = hashMapOf(
+                    "date" to date,
+                    "time" to time,
+                    "free" to (100 - free)
                 )
 
-                // Update the document with the new spots count
-                timeSlotDocument.reference.update(updates)
-                    .addOnSuccessListener {
-                        println("TimeSlot updated successfully")
+                db.collection(collectionName)
+                    .add(newDocument)
+                    .addOnSuccessListener { newDoc ->
+                        println("New document created with ID: ${newDoc.id}")
                     }
                     .addOnFailureListener { e ->
-                        Log.e("UpdateTimeSlot", "Error updating TimeSlot: ${e.message}", e)
-                        println("Error updating TimeSlot: $e")
+                        println("Error creating document: ${e.message}")
                     }
-            } else {
-                println("Not enough available spots")
             }
-        } else {
-            println("No matching time slot found")
         }
-    }
-
-}*/
+        .addOnFailureListener { e ->
+            println("Error finding document: ${e.message}")
+        }
+}
 
 @Composable
 fun DetailRow(label: String, value: String) {
