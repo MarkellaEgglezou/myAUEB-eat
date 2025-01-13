@@ -57,6 +57,53 @@ This app uses Firebase for:
 - Markella Englezou, t8210039@aueb.gr, AM: 8210039
 - Marina Gkolfinopoulou, t8210026@aueb.gr, AM: 8210026
 
+## Installation Guide for myAUEB eats
+
+
+### 1. **Using the Android APK**
+This method is quick and easy, requiring no special technical skills.
+
+**Steps:**
+1. Download the `app-release.apk` file from the GitHub repository.
+2. On your mobile device, go to **Settings** and enable the option for "Install from unknown sources" (or "Allow installation of apps from unknown sources").
+3. Open the APK file you downloaded and follow the prompts to install the app.
+4. Once installed, you can open the app and start using it right away!
+
+### 2. **Using Android Studio**
+This method requires you to have Android Studio and the necessary development tools installed on your computer.
+
+#### Prerequisites:
+Ensure that you have the following installed:
+- **Android Studio**: [Download Android Studio here](https://developer.android.com/studio)
+- **Git**: [Download Git here](https://git-scm.com/)
+- **Emulator** (within Android Studio): Ensure that you have set up an Android emulator within Android Studio.
+
+#### Steps:
+1. **Clone the repository to your local machine**:
+   Open the terminal (or Git Bash) and execute the following command to clone the repository:
+   ```bash
+   git clone https://github.com/MarkellaEgglezou/Lesxi_App.git
+   ```
+
+2. **Open the repository in Android Studio**:
+   - Launch **Android Studio** and choose the **Open** option.
+   - Select the folder of the repository you just cloned.
+   - Wait for all necessary dependencies to load and libraries to be set up (this may take some time).
+
+3. **Set up and select your device or emulator**:
+   - Make sure you have an Android emulator set up, or connect a physical device with **Developer Mode** and **USB Debugging** enabled.
+
+4. **Build and Run the Application**:
+   - In Android Studio, click the **Build** button to compile the app.
+   - Once the build completes, click **Run** and select the device or emulator you want to run the app on.
+
+5. **Use the App**:
+   - The app will be installed on your device or emulator, and you can start using it immediately!
+
+---
+
+By following these steps, you can easily install and run the app in the way that suits you best. If you need any help or encounter any issues, feel free to reach out to our team!
+
 ## 🛠️ Contributing
 Contributions are welcome! 
 
