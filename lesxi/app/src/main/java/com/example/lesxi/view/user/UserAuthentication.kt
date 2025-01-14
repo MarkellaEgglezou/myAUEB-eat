@@ -231,7 +231,11 @@ fun RegisterButton(modifier: Modifier = Modifier, email: String, password: Strin
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Button(onClick = {
-            if (password == confirm) {
+            if (email.isBlank() || password.isBlank() || confirm.isBlank() || name.isBlank() || surname.isBlank() || am.isBlank()) {
+                Toast.makeText(context, "Please fill in all the details.", Toast.LENGTH_SHORT).show()
+            } else if (password != confirm) {
+                Toast.makeText(context, "Passwords do not match.", Toast.LENGTH_SHORT).show()
+            } else {
                 registerUser(email = email, name=name, surname=surname, am=am, password = password, appContext = context)
             }
         }, colors = buttonColors(Color(0xFF762525)) ){
