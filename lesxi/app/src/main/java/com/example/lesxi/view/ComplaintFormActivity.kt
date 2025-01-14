@@ -58,7 +58,7 @@ class ComplaintFormActivity : ComponentActivity() {
                         Form(user)
                     } else {
                         Text(
-                            "You need to login first",
+                            stringResource(R.string.login_needed),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxSize()
                         )
@@ -83,17 +83,18 @@ fun Form(firebaseUser: FirebaseUser) {
     }
 
     if (am == null) {
-        Text("AM not found",
+        Text(
+            stringResource(R.string.am_not_found),
             modifier = Modifier.fillMaxSize(),
             textAlign = TextAlign.Center)
         return
     }
 
     val complaintCategories = listOf(
-        "Food Quality",
-        "Service Issues",
-        "Hygiene Concerns",
-        "Other"
+        stringResource(R.string.complaint_category_1),
+        stringResource(R.string.complaint_category_2),
+        stringResource(R.string.complaint_category_3),
+        stringResource(R.string.complaint_category_4)
     )
     val selectedCategory = remember { mutableStateOf("") }
     val isDropdownExpanded = remember { mutableStateOf(false) }
@@ -112,7 +113,7 @@ fun Form(firebaseUser: FirebaseUser) {
                 ),
                 title = {
                     Text(
-                        "Complaint Form",
+                        stringResource(R.string.form_title),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -146,7 +147,7 @@ fun Form(firebaseUser: FirebaseUser) {
                         value = selectedCategory.value,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Choose a category") },
+                        label = { Text(stringResource(R.string.choose_category)) },
                         modifier = Modifier
                             .padding(bottom = 16.dp)
                             .fillMaxWidth()
@@ -171,7 +172,7 @@ fun Form(firebaseUser: FirebaseUser) {
                 }
                 if (selectedCategoryError.value) {
                     Text(
-                        text = "Please choose a complaint category",
+                        text = stringResource(R.string.category_error),
                         color = Color.Red,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -198,13 +199,13 @@ fun Form(firebaseUser: FirebaseUser) {
                 )
                 if (complaintError.value) {
                     Text(
-                        text = "Please fill in your complaint",
+                        text = stringResource(R.string.complaint_error),
                         color = Color.Red,
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
 
-                Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(60.dp))
 
                 // Submit button
                 val context = LocalContext.current
@@ -259,6 +260,6 @@ fun SubmitButton(
         colors = buttonColors(Color(0xFF762525)),
         modifier = modifier
     ) {
-        Text("Submit")
+        Text(stringResource(R.string.submit))
     }
 }

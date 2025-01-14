@@ -52,6 +52,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.lesxi.R
@@ -83,7 +84,7 @@ class ProfileActivity : ComponentActivity() {
                         ProfileScreen(user)
                     } else {
                         Text(
-                            "User not logged in",
+                            stringResource(R.string.login_needed),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxSize()
                         )
@@ -123,7 +124,7 @@ fun ProfileScreen(firebaseUser: FirebaseUser) {
     }
     else {
         Text(
-            "Loading...",
+            stringResource(R.string.loading),
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxSize()
         )
@@ -149,7 +150,7 @@ fun UserProfile(
                 ),
                 title = {
                     Text(
-                        "Profile",
+                        stringResource(R.string.profile_title),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -174,9 +175,9 @@ fun UserProfile(
 
                 // Reservations
                 item {
-                    SectionTitle("Reservations")
+                    SectionTitle(stringResource(R.string.reservations))
                     if (reservations.isEmpty()) {
-                        Text("No reservations found.")
+                        Text(stringResource(R.string.empty_reservations))
                     } else {
                         ReservationList(reservations.map { it })
                     }
@@ -188,9 +189,9 @@ fun UserProfile(
 
                 // Complaints
                 item {
-                    SectionTitle("Complaints")
+                    SectionTitle(stringResource(R.string.complaints))
                     if (complaints.isEmpty()) {
-                        Text("No complaints registered.")
+                        Text(stringResource(R.string.empty_complaints))
                     } else {
                         ComplaintList(complaints.map { it })
                     }
@@ -222,15 +223,15 @@ fun ProfilePicture(
     // Determine which image to show based on user.avatar_photo
     val painter = if (user.avatarPhoto.isNotEmpty()) {
         val avatarResId = when (user.avatarPhoto) {
-            "bear" -> R.drawable.bear
-            "cat" -> R.drawable.cat
-            "koala" -> R.drawable.koala
-            "lion" -> R.drawable.lion
-            "meerkat" -> R.drawable.meerkat
-            "panda" -> R.drawable.panda
-            "polar_bear" -> R.drawable.polar_bear
-            "puffer_fish" -> R.drawable.puffer_fish
-            "sea_lion" -> R.drawable.sea_lion
+            stringResource(R.string.avatar_1) -> R.drawable.bear
+            stringResource(R.string.avatar_2) -> R.drawable.cat
+            stringResource(R.string.avatar_3) -> R.drawable.koala
+            stringResource(R.string.avatar_4) -> R.drawable.lion
+            stringResource(R.string.avatar_5) -> R.drawable.meerkat
+            stringResource(R.string.avatar_6) -> R.drawable.panda
+            stringResource(R.string.avatar_7) -> R.drawable.polar_bear
+            stringResource(R.string.avatar_8) -> R.drawable.puffer_fish
+            stringResource(R.string.avatar_9) -> R.drawable.sea_lion
             else -> R.drawable.ic_launcher_foreground // Default image in case of unexpected value
         }
         painterResource(id = avatarResId)
@@ -247,7 +248,7 @@ fun ProfilePicture(
     ) {
         Image(
             painter = painter,
-            contentDescription = "Profile Picture",
+            contentDescription = stringResource(R.string.profile_picture),
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
@@ -292,7 +293,7 @@ fun UserInfo(uid: String, user: User) {
             // Edit icon
             Icon(
                 imageVector = Icons.Default.Edit,
-                contentDescription = "Edit Profile",
+                contentDescription = stringResource(R.string.edit_profile),
                 modifier = Modifier
                     .size(24.dp)
                     .clickable {
@@ -305,20 +306,20 @@ fun UserInfo(uid: String, user: User) {
             // Logout icon
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                contentDescription = "Logout",
+                contentDescription = stringResource(R.string.logout),
                 modifier = Modifier
                     .size(24.dp)
                     .clickable {
                         Toast.makeText(context, "Logout successful", Toast.LENGTH_SHORT).show()
                         FirebaseAuth.getInstance().signOut()
 
-
-                        val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                        val sharedPreferences = context.getSharedPreferences("app_prefs",
+                            Context.MODE_PRIVATE)
                         sharedPreferences.edit().clear().apply()
 
-
                         val intent = Intent(context, MainActivity::class.java)
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                or Intent.FLAG_ACTIVITY_NEW_TASK)
                         context.startActivity(intent)
                         (context as Activity).finish()
                     }
@@ -384,7 +385,8 @@ fun ReservationList(reservations: List<Reservation>) {
                     colors = buttonColors(Color(0xFF762525)),
                     modifier = Modifier.fillMaxWidth().padding(8.dp)
                 ) {
-                    Text(if (isExpanded) "Show Less" else "Show More")
+                    Text(if (isExpanded) stringResource(R.string.show_less)
+                    else stringResource(R.string.show_more))
                 }
 
                 // Show the remaining reservations if expanded
@@ -442,7 +444,8 @@ fun ComplaintList(complaints: List<Complaint>) {
                     colors = buttonColors(Color(0xFF762525)),
                     modifier = Modifier.fillMaxWidth().padding(8.dp)
                 ) {
-                    Text(if (isExpanded) "Show Less" else "Show More")
+                    Text(if (isExpanded) stringResource(R.string.show_less)
+                    else stringResource(R.string.show_more))
                 }
 
                 // Show the remaining complaints if expanded
@@ -485,17 +488,18 @@ fun EditUserDialog(uid: String, user: User, onDismiss: () -> Unit) {
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(text = "Edit Profile", style = MaterialTheme.typography.titleMedium)
+                Text(text = stringResource(R.string.edit_profile),
+                    style = MaterialTheme.typography.titleMedium)
 
                 androidx.compose.material3.OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Name") }
+                    label = { Text(stringResource(R.string.name)) }
                 )
                 androidx.compose.material3.OutlinedTextField(
                     value = surname,
                     onValueChange = { surname = it },
-                    label = { Text("Surname") }
+                    label = { Text(stringResource(R.string.surname)) }
                 )
 
                 Row(
@@ -504,7 +508,7 @@ fun EditUserDialog(uid: String, user: User, onDismiss: () -> Unit) {
                 ) {
                     Button(colors = buttonColors(Color(0xFF762525)),
                         onClick = onDismiss) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancel))
                     }
 
                     Spacer(modifier = Modifier.width(16.dp))
@@ -517,7 +521,7 @@ fun EditUserDialog(uid: String, user: User, onDismiss: () -> Unit) {
                             updateUser(uid, updatedUser)
                             onDismiss()
                     }) {
-                        Text("Save")
+                        Text(stringResource(R.string.save))
                     }
                 }
             }
@@ -533,15 +537,15 @@ fun AvatarSelectionDialog(
 ) {
     // List of avatar names
     val avatars = listOf(
-        "bear",
-        "cat",
-        "koala",
-        "lion",
-        "meerkat",
-        "panda",
-        "polar_bear",
-        "puffer_fish",
-        "sea_lion"
+        stringResource(R.string.avatar_1),
+        stringResource(R.string.avatar_2),
+        stringResource(R.string.avatar_3),
+        stringResource(R.string.avatar_4),
+        stringResource(R.string.avatar_5),
+        stringResource(R.string.avatar_6),
+        stringResource(R.string.avatar_7),
+        stringResource(R.string.avatar_8),
+        stringResource(R.string.avatar_9)
     )
 
     var selectedAvatar by remember { mutableStateOf<String?>(null) }
@@ -558,7 +562,8 @@ fun AvatarSelectionDialog(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(text = "Select Your Avatar", style = MaterialTheme.typography.titleMedium)
+                Text(text = stringResource(R.string.avatar_select),
+                    style = MaterialTheme.typography.titleMedium)
 
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
@@ -583,7 +588,7 @@ fun AvatarSelectionDialog(
                         colors = buttonColors(Color(0xFF762525)),
                         onClick = onDismiss
                     ) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancel))
                     }
 
                     Spacer(modifier = Modifier.width(16.dp))
@@ -598,7 +603,7 @@ fun AvatarSelectionDialog(
                             onDismiss()
                         }
                     ) {
-                        Text("Save")
+                        Text(stringResource(R.string.save))
                     }
                 }
             }
@@ -618,15 +623,15 @@ fun AvatarItem(avatar: String, isSelected: Boolean, onClick: () -> Unit) {
             .clickable { onClick() }
     ) {
         val imageId = when (avatar) {
-            "bear" -> R.drawable.bear
-            "cat" -> R.drawable.cat
-            "koala" -> R.drawable.koala
-            "lion" -> R.drawable.lion
-            "meerkat" -> R.drawable.meerkat
-            "panda" -> R.drawable.panda
-            "polar_bear" -> R.drawable.polar_bear
-            "puffer_fish" -> R.drawable.puffer_fish
-            "sea_lion" -> R.drawable.sea_lion
+            stringResource(R.string.avatar_1) -> R.drawable.bear
+            stringResource(R.string.avatar_2) -> R.drawable.cat
+            stringResource(R.string.avatar_3) -> R.drawable.koala
+            stringResource(R.string.avatar_4) -> R.drawable.lion
+            stringResource(R.string.avatar_5) -> R.drawable.meerkat
+            stringResource(R.string.avatar_6) -> R.drawable.panda
+            stringResource(R.string.avatar_7) -> R.drawable.polar_bear
+            stringResource(R.string.avatar_8) -> R.drawable.puffer_fish
+            stringResource(R.string.avatar_9) -> R.drawable.sea_lion
             else -> R.drawable.bear
         }
 
