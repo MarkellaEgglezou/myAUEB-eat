@@ -75,7 +75,7 @@ fun LoginRegisterScreen(navController: NavHostController, onLoginSuccess: (Boole
         if (isLoginMode) {
 
             Image(
-                painter = painterResource(id = R.drawable.aueb_eat_round), // Use your image resource here
+                painter = painterResource(id = R.drawable.myauebeat), // Use your image resource here
                 contentDescription = "Reservation Confirmation Image",
                 modifier = Modifier
                     .fillMaxWidth()
