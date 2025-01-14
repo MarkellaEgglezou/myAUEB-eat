@@ -49,6 +49,7 @@ import com.example.lesxi.data.model.*
 import com.google.gson.Gson
 import androidx.compose.ui.platform.LocalContext
 import com.example.lesxi.R
+import com.example.lesxi.data.fetchDishesForDay
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -177,31 +178,6 @@ fun ShowMenuItems(
 }
 
 
-
-
-
-@Composable
-fun fetchDishesForDay(day: String, type: List<String>): List<MenuItem> {
-    val db = FirebaseFirestore.getInstance()
-    var items by remember { mutableStateOf<List<MenuItem>>(emptyList()) }
-
-    Log.d("foodybefore", "$type")
-
-    LaunchedEffect(day, type) {
-        db.collection("Menu")
-            .whereEqualTo("day", day)
-            .whereIn("type", type)
-            .get()
-            .addOnSuccessListener { snapshot ->
-                items = snapshot.documents.mapNotNull { it.toObject<MenuItem>() }
-                Log.d("food", "$items")
-            }
-            .addOnFailureListener { exception ->
-                println("Error getting documents: $exception")
-            }
-    }
-    return items
-}
 
 @Composable
 fun ShowItems(item: MenuItem, mutableState: MutableState<Boolean>) {
