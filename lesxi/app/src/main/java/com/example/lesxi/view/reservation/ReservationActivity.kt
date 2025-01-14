@@ -1,4 +1,4 @@
-package com.example.lesxi.view
+package com.example.lesxi.view.reservation
 
 import android.app.DatePickerDialog
 import android.net.Uri
@@ -53,9 +53,7 @@ import com.example.lesxi.data.model.ReservationDetails
 import com.example.lesxi.data.model.Routes
 import com.example.lesxi.data.model.User
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
-import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
