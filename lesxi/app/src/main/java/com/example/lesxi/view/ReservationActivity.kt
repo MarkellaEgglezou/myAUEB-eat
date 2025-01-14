@@ -46,6 +46,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.lesxi.R
+import com.example.lesxi.data.fetchAvailableSpots
+import com.example.lesxi.data.fetchUnavailableSlots
 import com.example.lesxi.data.fetchUser
 import com.example.lesxi.data.model.ReservationDetails
 import com.example.lesxi.data.model.Routes
@@ -168,29 +170,6 @@ fun ReserveTableScreen(navController: NavController, firebaseUser: FirebaseUser)
             }
 
 
-            suspend fun fetchUnavailableSlots(date: String): List<String> {
-                val db = FirebaseFirestore.getInstance()
-                val timeSlotss = mutableListOf<String>()
-
-                try {
-                val result = db.collection("TimeSlots")
-                    .whereEqualTo("date", date)
-                    .whereEqualTo("free", 0)
-                    .get()
-                    .await()
-
-
-                    for (document in result) {
-                        val timeSlott = document.getString("time")
-                        timeSlott?.let { timeSlotss.add(it) }
-                    }
-                } catch (exception: Exception) {
-                    println("Error getting documents: $exception")
-                }
-
-                return timeSlotss
-            }
-
             LaunchedEffect(selectedDate) {
                 if (selectedDate != "Choose Date") {
                     // Call the suspend function to fetch unavailable slots
@@ -294,26 +273,7 @@ fun ReserveTableScreen(navController: NavController, firebaseUser: FirebaseUser)
             }
                 val context = LocalContext.current
 
-                suspend fun fetchAvailableSpots(date: String, time: String): Int {
-                    val db = FirebaseFirestore.getInstance()
-                    val snapshot = db.collection("TimeSlots")
-                        .whereEqualTo("date", date)
-                        .whereEqualTo("time", time)
-                        .get()
-                        .await()
-                    Log.d("check", "check: $date")
-                    Log.d("check", "check: $time")
 
-                    var spots = 100
-                    if (!snapshot.isEmpty) {
-                        val document = snapshot.documents.first()
-                        spots = document.getLong("free")?.toInt() ?: 100
-                        Log.d("checkfirst", "check: $spots")
-                        return spots
-                    }
-                    Log.d("check", "check: $spots")
-                    return spots
-                }
 
             LaunchedEffect(selectedDate, currentSelectedTime) {
                 if (selectedDate != "Choose Date" && currentSelectedTime != "Choose Time") {
