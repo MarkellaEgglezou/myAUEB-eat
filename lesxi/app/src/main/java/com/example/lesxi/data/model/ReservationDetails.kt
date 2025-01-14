@@ -5,4 +5,5 @@ data class ReservationDetails(
     val date: String,
     val numberOfPeople: String,
     val time: String,
+    val type: List<String>,
 )

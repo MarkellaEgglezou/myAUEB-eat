@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -71,6 +73,16 @@ fun LoginRegisterScreen(navController: NavHostController, onLoginSuccess: (Boole
     ) {
 
         if (isLoginMode) {
+
+            Image(
+                painter = painterResource(id = R.drawable.myauebeat), // Use your image resource here
+                contentDescription = "Reservation Confirmation Image",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp) // You can adjust the height of the image here
+                    .padding(bottom = 16.dp)
+            )
+
             Text(
                 text = stringResource(R.string.login),
                 fontSize = 24.sp,
@@ -219,7 +231,11 @@ fun RegisterButton(modifier: Modifier = Modifier, email: String, password: Strin
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Button(onClick = {
-            if (password == confirm) {
+            if (email.isBlank() || password.isBlank() || confirm.isBlank() || name.isBlank() || surname.isBlank() || am.isBlank()) {
+                Toast.makeText(context, "Please fill in all the details.", Toast.LENGTH_SHORT).show()
+            } else if (password != confirm) {
+                Toast.makeText(context, "Passwords do not match.", Toast.LENGTH_SHORT).show()
+            } else {
                 registerUser(email = email, name=name, surname=surname, am=am, password = password, appContext = context)
             }
         }, colors = buttonColors(Color(0xFF762525)) ){
@@ -232,7 +248,7 @@ private fun loginUser(email: String, password: String, appContext: Context, navC
     FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
         .addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                Toast.makeText(appContext, "User Login In Successfully", Toast.LENGTH_SHORT).show()
+                Toast.makeText(appContext, "User Login Successful", Toast.LENGTH_SHORT).show()
 //                navController.navigate(Routes.main_page) {
 //                    popUpTo(Routes.login) { inclusive = true } // Clear back stack
 //                }
@@ -270,7 +286,7 @@ private fun registerUser(email: String, name: String, surname: String, am: Strin
                         appContext.startActivity(intent)
 
 
-                        Toast.makeText(appContext, "User Registered Successfully!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(appContext, "User Registration Successfull!", Toast.LENGTH_SHORT).show()
                     }
                     .addOnFailureListener { exception ->
                         Toast.makeText(appContext, "Error saving user data: ${exception.message}", Toast.LENGTH_SHORT).show()

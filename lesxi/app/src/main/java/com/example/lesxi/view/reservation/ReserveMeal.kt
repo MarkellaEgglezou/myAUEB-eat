@@ -1,6 +1,7 @@
-package com.example.lesxi.view
+package com.example.lesxi.view.reservation
 
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,10 +30,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,12 +40,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.toObject
 import com.example.lesxi.data.model.*
 import com.google.gson.Gson
 import androidx.compose.ui.platform.LocalContext
 import com.example.lesxi.R
+import com.example.lesxi.data.fetchDishesForDay
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,11 +68,13 @@ fun ShowMenuItems(
     )
 
     val dayReserve = dayMap[day]
-    val itemsForDay = dayReserve?.let { fetchDishesForDay(it) }
+    val type = reservationDetails.type
+    val itemsForDay = dayReserve?.let { fetchDishesForDay(dayReserve, type) }
     val scrollState = rememberScrollState()
 
     val itemCheckedStates = remember { mutableListOf<MutableState<Boolean>>() }
 
+    Log.d("foods", "foods are:$type")
 
     itemsForDay?.let {
         itemCheckedStates.clear()
@@ -161,41 +161,8 @@ fun ShowMenuItems(
                         // Show a toast if no food items are available
                         Toast.makeText(context, "No food items available for this day.", Toast.LENGTH_SHORT).show()
                     }
-                    },/*
-                        if (itemsForDay?.size == itemCheckedStates.size) {
-                        // Filter checked items
-                            val checkedItems = itemsForDay.filterIndexed { index, item ->
-                                itemCheckedStates[index].value // Filter based on checked state
-                            }
+                    },
 
-                            val reserveItems = mutableListOf<String>()
-                            if (checkedItems.isNotEmpty()) {
-                                checkedItems.forEach { item ->
-                                    reserveItems.add(item.title)  // Add the title to reserveItems
-                                }
-                            } else {
-                                println("checkedItems is empty or null")
-                            }
-
-                            // Serialize data into JSON
-                            val reservationJson = Gson().toJson(reservationDetails)
-                            val itemsJson = Gson().toJson(reserveItems)
-
-                            // Encode the JSON strings
-                            val encodedReservationJson = Uri.encode(reservationJson)
-                            val encodedItemsJson = Uri.encode(itemsJson)
-
-                            // Navigate with the encoded data
-                            navController.navigate(Routes.finishReservation + "/$encodedReservationJson/$encodedItemsJson")
-                        } else {
-                            println("Error: Mismatched sizes between itemsForDay and itemCheckedStates")
-                        }
-                    } else {
-
-                        Toast.makeText(context, "Pick at least one item of food.", Toast.LENGTH_SHORT).show()
-                    }
-
-                },*/
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                 colors = buttonColors(Color(0xFF762525))
             ) {
@@ -206,25 +173,6 @@ fun ShowMenuItems(
 }
 
 
-
-
-
-@Composable
-fun fetchDishesForDay(day: String): List<MenuItem> {
-    val db = FirebaseFirestore.getInstance()
-    var items by remember { mutableStateOf<List<MenuItem>>(emptyList()) }
-
-    db.collection("Menu")
-        .whereEqualTo("day", day)
-        .get()
-        .addOnSuccessListener { snapshot ->
-            items = snapshot.documents.mapNotNull { it.toObject<MenuItem>() }
-        }
-        .addOnFailureListener { exception ->
-            println("Error getting documents: $exception")
-        }
-    return items
-}
 
 @Composable
 fun ShowItems(item: MenuItem, mutableState: MutableState<Boolean>) {

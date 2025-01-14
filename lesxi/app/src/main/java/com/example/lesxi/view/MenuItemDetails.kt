@@ -93,6 +93,7 @@ fun MenuItemDetailsScreen(itemID: String, navController: NavController) {
                             text = item?.title ?: stringResource(R.string.no_avail),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
+                                .padding(end = 30.dp)
                         )
                     })
             }

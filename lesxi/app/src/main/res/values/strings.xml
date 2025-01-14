@@ -1,10 +1,7 @@
 <resources>
     <string name="app_name">myAUEB eat</string>
-    <string name="title_activity_complaint_form">ComplaintFormActivity</string>
-    <string name="complaint_category">What is your complaint category?</string>
-    <string name="complaint">What is your complaint?</string>
-    <string name="upload_photo">Would you like to upload a photo?</string>
-    <string name="submit">Submit Form</string>
+    <string name="login_needed">You need to login first!</string>
+    <string name="am_not_found">User AM not found!</string>
 
     <!--  Navigation Items  -->
     <string name="nav_item_homepage">Home</string>
@@ -37,4 +34,43 @@
     <string name="add_reservation">Make a Reservation</string>
     <string name="select_date">Select Reservation Date</string>
     <string name="select_time">Select Reservation Time</string>
+
+    <!--  Complaint Form Items  -->
+    <string name="form_title">Complaint Form</string>
+    <string name="complaint_category_1">Food Quality</string>
+    <string name="complaint_category_2">Service Issues</string>
+    <string name="complaint_category_3">Hygiene Concerns</string>
+    <string name="complaint_category_4">Other</string>
+    <string name="complaint_category">What is your complaint category?</string>
+    <string name="choose_category">Choose a category</string>
+    <string name="category_error">Please choose a complaint category</string>
+    <string name="complaint">What is your complaint?</string>
+    <string name="complaint_error">Please fill in your complaint</string>
+    <string name="submit">Submit</string>
+
+    <!--  Profile Items  -->
+    <string name="loading">Loading…</string>
+    <string name="profile_title">Profile</string>
+    <string name="reservations">Reservations</string>
+    <string name="empty_reservations">No reservations found.</string>
+    <string name="complaints">Complaints</string>
+    <string name="empty_complaints">No complaints found.</string>
+    <string name="avatar_select">Select Your Avatar</string>
+    <string name="avatar_1">bear</string>
+    <string name="avatar_2">cat</string>
+    <string name="avatar_3">koala</string>
+    <string name="avatar_4">lion</string>
+    <string name="avatar_5">meerkat</string>
+    <string name="avatar_6">panda</string>
+    <string name="avatar_7">polar_bear</string>
+    <string name="avatar_8">puffer_fish</string>
+    <string name="avatar_9">sea_lion</string>
+    <string name="profile_picture">Profile Picture</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="logout">Logout</string>
+    <string name="show_more">Show More</string>
+    <string name="show_less">Show Less</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+
 </resources>

@@ -7,9 +7,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.lesxi.view.ConfirmationScreen
-import com.example.lesxi.view.ReserveTableScreen
-import com.example.lesxi.view.ShowMenuItems
+import com.example.lesxi.view.reservation.ConfirmationScreen
+import com.example.lesxi.view.reservation.ReserveTableScreen
+import com.example.lesxi.view.reservation.ShowMenuItems
 import com.example.lesxi.data.model.ReservationDetails
 import com.example.lesxi.data.model.Routes
 import com.example.lesxi.view.MenuLexi

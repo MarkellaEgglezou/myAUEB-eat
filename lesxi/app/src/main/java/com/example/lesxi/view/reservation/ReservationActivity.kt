@@ -1,7 +1,8 @@
-package com.example.lesxi.view
+package com.example.lesxi.view.reservation
 
 import android.app.DatePickerDialog
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -45,14 +46,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.lesxi.R
+import com.example.lesxi.data.fetchAvailableSpots
+import com.example.lesxi.data.fetchUnavailableSlots
 import com.example.lesxi.data.fetchUser
 import com.example.lesxi.data.model.ReservationDetails
 import com.example.lesxi.data.model.Routes
 import com.example.lesxi.data.model.User
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
-import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -89,6 +90,7 @@ fun ReserveTableScreen(navController: NavController, firebaseUser: FirebaseUser)
     var selectedTime by remember { mutableStateOf("Choose Time") }
     var numberOfPeople by remember { mutableStateOf("") }
     var unavailableSlots by remember { mutableStateOf<List<String>>(emptyList()) }
+    var availableSpots by remember { mutableStateOf(100) }
 
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -165,29 +167,6 @@ fun ReserveTableScreen(navController: NavController, firebaseUser: FirebaseUser)
                 listOf()
             }
 
-
-            suspend fun fetchUnavailableSlots(date: String): List<String> {
-                val db = FirebaseFirestore.getInstance()
-                val timeSlotss = mutableListOf<String>()
-
-                try {
-                val result = db.collection("TimeSlots")
-                    .whereEqualTo("date", date)
-                    .whereEqualTo("free", 0)
-                    .get()
-                    .await()
-
-
-                    for (document in result) {
-                        val timeSlott = document.getString("time")
-                        timeSlott?.let { timeSlotss.add(it) }
-                    }
-                } catch (exception: Exception) {
-                    println("Error getting documents: $exception")
-                }
-
-                return timeSlotss
-            }
 
             LaunchedEffect(selectedDate) {
                 if (selectedDate != "Choose Date") {
@@ -291,7 +270,16 @@ fun ReserveTableScreen(navController: NavController, firebaseUser: FirebaseUser)
                     onCheckedChange = { isDisabled = it })
             }
                 val context = LocalContext.current
-                val noofpeople = arrayOf(
+
+
+
+            LaunchedEffect(selectedDate, currentSelectedTime) {
+                if (selectedDate != "Choose Date" && currentSelectedTime != "Choose Time") {
+                    availableSpots = fetchAvailableSpots(selectedDate, currentSelectedTime)
+                }
+            }
+
+            val noofpeople = arrayOf(
                     "Select number of people for dining in",
                     "1",
                     "2",
@@ -304,6 +292,10 @@ fun ReserveTableScreen(navController: NavController, firebaseUser: FirebaseUser)
                     "9",
                     "10"
                 )
+
+                val validOptions = noofpeople.filter { it.toIntOrNull() ?: 0 <= availableSpots /*&& it != "Select number of people for dining in"*/ }
+                Log.d("Filtering", "Filtered Options: $validOptions")
+
                 var expanded by remember { mutableStateOf(false) }
                 var selectedText by remember { mutableStateOf(noofpeople[0]) }
 
@@ -337,7 +329,7 @@ fun ReserveTableScreen(navController: NavController, firebaseUser: FirebaseUser)
                             expanded = expanded,
                             onDismissRequest = { expanded = false }
                         ) {
-                            noofpeople.forEach { item ->
+                            validOptions.forEach { item ->
                                 DropdownMenuItem(
                                     text = { Text(text = item) },
                                     onClick = {
@@ -351,6 +343,26 @@ fun ReserveTableScreen(navController: NavController, firebaseUser: FirebaseUser)
                     }
                 }
 
+            fun getMealTypeForTimeSlot(timeSlot: String): List<String> {
+                return when (timeSlot) {
+                    "08:00 AM" -> {
+                        listOf("Breakfast")
+                    }
+                    in listOf("12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM", "03:00 PM") -> {
+                        listOf("Lunch", "Appetizer", "Dessert")
+                    }
+                    in listOf("07:00 PM", "07:30 PM", "08:00 PM") -> {
+                        listOf("Dinner", "Appetizer", "Dessert")
+                    }
+                    else -> {
+                        listOf()
+                    }
+                }
+            }
+
+
+            val typeofmeal = getMealTypeForTimeSlot(selectedTime.toString().substring(19,27))
+
             Spacer(modifier = Modifier.weight(1f))
             Button(
                 onClick = {if (selectedDate != "Choose Date" && selectedTime.value.isNotEmpty() && (isDisabled || selectedText != "Select number of people for dining in")) {
@@ -359,6 +371,7 @@ fun ReserveTableScreen(navController: NavController, firebaseUser: FirebaseUser)
                         am = am!!,
                         date = selectedDate, time = selectedTime.toString(),
                         numberOfPeople = numberOfPeople,
+                        type = typeofmeal
                     )
 
                     val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")

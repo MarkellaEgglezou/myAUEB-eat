@@ -1,4 +1,4 @@
-package com.example.lesxi.view
+package com.example.lesxi.view.reservation
 
 
 import android.content.Context
@@ -26,7 +26,9 @@ import androidx.navigation.NavHostController
 import com.example.lesxi.R
 import com.example.lesxi.data.model.ReservationDetails
 import com.example.lesxi.data.model.Routes
+import com.example.lesxi.data.saveReservationToFirebase
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FieldValue
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -144,84 +146,6 @@ fun ConfirmationScreen(
     }
 
 }
-
-fun saveReservationToFirebase(
-    context: Context,
-    navController: NavHostController,
-    reservationDetails: ReservationDetails,
-    items: List<String>
-) {
-    val db = FirebaseFirestore.getInstance()
-
-    // Prepare data to save
-    val reservationData = hashMapOf(
-        "am" to reservationDetails.am,
-        "date" to reservationDetails.date,
-        "time" to reservationDetails.time.substring(19, 27),
-        "numberOfPeople" to reservationDetails.numberOfPeople,
-        "items" to items
-    )
-
-    // Save data to FireBase
-    db.collection("Reservation")
-        .add(reservationData)
-        .addOnSuccessListener {
-
-            //updateTimeSlot(reservationDetails.date, reservationDetails.time, reservationDetails.numberOfPeople.toInt())
-
-            Toast.makeText(context, "Reservation confirmed!", Toast.LENGTH_SHORT).show()
-            //navController.popBackStack()
-            navController.navigate(Routes.main_page) //it doesn't land there - app turns off
-        }
-        .addOnFailureListener { exception ->
-            // Handle error
-            println("Error saving reservation: $exception")
-        }
-}
-
-/*fun updateTimeSlot(date: String, time: String, numberOfPeople: Int) {
-    val db = FirebaseFirestore.getInstance()
-
-    // Reference the document in TimeSlots collection for the given date and time
-    val timeSlotRef = db.collection("TimeSlots")
-        .whereEqualTo("date", date)
-        .whereEqualTo("time", time)
-        .limit(1)
-
-    timeSlotRef.get().addOnSuccessListener { result ->
-        if (!result.isEmpty) {
-            // Assuming the document is found and we have the timeSlot document
-            val timeSlotDocument = result.documents[0]
-            val freeSpots = timeSlotDocument.getLong("free")?.toInt() ?: 0
-
-            Log.d("updateTimeSlot", "Found time slot: $timeSlotDocument")
-
-            if (freeSpots > 0) {
-                // Update the booked spots and available spots
-                val updatedFreeSpots = freeSpots - numberOfPeople
-
-                val updates: MutableMap<String, Any> = hashMapOf(
-                    "free" to updatedFreeSpots
-                )
-
-                // Update the document with the new spots count
-                timeSlotDocument.reference.update(updates)
-                    .addOnSuccessListener {
-                        println("TimeSlot updated successfully")
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("UpdateTimeSlot", "Error updating TimeSlot: ${e.message}", e)
-                        println("Error updating TimeSlot: $e")
-                    }
-            } else {
-                println("Not enough available spots")
-            }
-        } else {
-            println("No matching time slot found")
-        }
-    }
-
-}*/
 
 @Composable
 fun DetailRow(label: String, value: String) {
