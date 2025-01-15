@@ -82,7 +82,7 @@ Ensure that you have the following installed:
 1. **Clone the repository to your local machine**:
    Open the terminal (or Git Bash) and execute the following command to clone the repository:
    ```bash
-     git clone https://github.com/MarkellaEgglezou/Lesxi_App.git
+     git clone https://github.com/MarkellaEgglezou/myAUEB-eat.git
    ```
 
 2. **Open the repository in Android Studio**:
