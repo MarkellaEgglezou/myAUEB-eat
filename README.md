@@ -1,5 +1,5 @@
-# myAUEB eats 🍴
-Welcome to myAUEB eats, your companion for dining at the AUEB! This Android application, developed using Kotlin and Jetpack Compose, provides a seamless experience for browsing the daily menu, reserving tables or takeout, managing complaints, and keeping track of your profile and activities.
+# myAUEB eat 🍴
+Welcome to myAUEB eat, your companion for dining at the AUEB! This Android application, developed using Kotlin and Jetpack Compose, provides a seamless experience for browsing the daily menu, reserving tables or takeout, managing complaints, and keeping track of your profile and activities.
 
 ## ✨ Features
 ### 1. Daily Menu
@@ -82,7 +82,7 @@ Ensure that you have the following installed:
 1. **Clone the repository to your local machine**:
    Open the terminal (or Git Bash) and execute the following command to clone the repository:
    ```bash
-   git clone https://github.com/MarkellaEgglezou/Lesxi_App.git
+     git clone https://github.com/MarkellaEgglezou/Lesxi_App.git
    ```
 
 2. **Open the repository in Android Studio**:
